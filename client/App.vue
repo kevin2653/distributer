@@ -1,13 +1,12 @@
 <template>
   <div id="app">
     <nprogress-container></nprogress-container>
-    <navbar :show="true"></navbar>
-    <sidebar :show="sidebar.opened && !sidebar.hidden"></sidebar>
+    <navbar :show="show"></navbar>
+    <sidebar :show="show"></sidebar>
     <app-main></app-main>
     <footer-bar></footer-bar>
   </div>
 </template>
-
 <script>
 import NprogressContainer from 'vue-nprogress/src/NprogressContainer'
 import { Navbar, Sidebar, AppMain, FooterBar } from 'components/layout/'
@@ -21,7 +20,40 @@ export default {
     FooterBar,
     NprogressContainer
   },
-
+  data () {
+    return {
+      show: true
+    }
+  },
+  watch: {
+    '$route' () {
+//      console.log(this.$route.name)
+      // 不等于登录页面的时候为true
+//      window.addEventlistener('beforeunload', F5)
+//      console.log('登陆界面STRAT')
+      if (this.$route.path !== '/login') {
+        this.show = true
+      } else {
+        this.show = false
+      }
+//      this.show = (this.$route.path !== '/login')
+//      console.log('登陆界面END')
+    }
+  },
+  mounted: function () {
+    var that = this
+//    console.log('监听界面刷新')
+    window.onload = function () {
+//      console.log('监听界面刷新111111')
+      if (that.$route.path === '/login') {
+        that.show = false
+//        console.log('监听界面刷新22222')
+      } else {
+//        console.log('监听界面刷新33333')
+        that.show = true
+      }
+    }
+  },
   beforeMount () {
     const { body } = document
     const WIDTH = 768

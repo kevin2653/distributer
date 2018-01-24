@@ -1,8 +1,8 @@
 <template>
   <aside class="menu app-sidebar animated" :class="{ slideInLeft: show, slideOutLeft: !show }">
-    <p class="menu-label">
-      General
-    </p>
+    <!--<p class="menu-label">-->
+      <!--General-->
+    <!--</p>-->
     <ul class="menu-list">
       <li v-for="(item, index) in menu">
         <router-link :to="item.path" :exact="true" :aria-expanded="isExpanded(item) ? 'true' : 'false'" v-if="item.path" @click.native="toggle(index, item)">
@@ -142,7 +142,7 @@ export default {
   left: 0;
   bottom: 0;
   padding: 20px 0 50px;
-  width: 180px;
+  width: 220px;
   min-width: 45px;
   max-height: 100vh;
   height: calc(100% - 50px);

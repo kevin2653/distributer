@@ -1,3 +1,4 @@
+<!--
 <template>
   <div>
     <div class="tile is-ancestor">
@@ -109,7 +110,7 @@
 import Chart from 'vue-bulma-chartjs'
 
 export default {
-  components: {
+  visa: {
     Chart
   },
 
@@ -153,3 +154,4 @@ export default {
 
 <style lang="scss" scoped>
 </style>
+-->

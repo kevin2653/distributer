@@ -9,7 +9,11 @@ import router from './router'
 import store from './store'
 import * as filters from './filters'
 import { TOGGLE_SIDEBAR } from 'vuex-store/mutation-types'
-
+import ElementUI from 'element-ui'
+import '_element-ui@2.0.7@element-ui/lib/theme-chalk/index.css'
+// https://api.yuelvhui.com/
+Vue.prototype.api = 'https://qa-api.yuelvhui.com/'
+Vue.use(ElementUI)
 Vue.router = router
 Vue.use(VueAxios, axios)
 Vue.use(VueAuth, {

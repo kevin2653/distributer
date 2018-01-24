@@ -1,3 +1,4 @@
+<!--
 <template>
   <div>
     <div class="tile is-ancestor">
@@ -72,7 +73,7 @@ import Chart from 'vue-bulma-chartjs'
 const api = '/MODApis/Api/v2/InteractiveChart/json'
 
 export default {
-  components: {
+  visa: {
     Chart
   },
 
@@ -153,3 +154,4 @@ export default {
 
 <style scoped>
 </style>
+-->

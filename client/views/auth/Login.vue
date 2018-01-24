@@ -1,105 +1,117 @@
 <template>
-<div class="content has-text-centered">
-  <h1 class="is-title is-bold">Login</h1>
+  <div class="content has-text-centered">
 
-  <div class="columns is-vcentered">
-    <div class="column is-6 is-offset-3">
-      <div class="box">
-        <div v-show="error" style="color:red; word-wrap:break-word;">{{ error }}</div>
-        <form v-on:submit.prevent="login">
-          <label class="label">Email</label>
-          <p class="control">
-            <input v-model="data.body.username" class="input" type="text" placeholder="email@example.org">
-          </p>
-          <label class="label">Password</label>
-          <p class="control">
-            <input v-model="data.body.password" class="input" type="password" placeholder="password">
-          </p>
-
-          <p class="control">
-            <label class="checkbox">
-              <input type="checkbox" v-model="data.rememberMe">
-              Remember me
-            </label>
-          </p>
-
-          <hr>
-          <p class="control">
-            <button type="submit" class="button is-primary">Login</button>
-            <button class="button is-default">Cancel</button>
-          </p>
-        </form>
+    <div class="columns is-vcentered">
+      <div style="margin-left: 40rem;margin-top: 10rem">
+        <img src="~assets/logo.png"/>
+        <h2 class="is-title is-bold">环球悦旅会代理商管理系统</h2>
+        <br>
+        <el-form :model="systemLoginForm" :rules="rules" ref="systemLoginForm" class="demo-ruleForm">
+          <el-form-item prop="managerAccount">
+            <el-input v-model="systemLoginForm.managerAccount" placeholder="用户名" style="width: 23.2rem"></el-input>
+          </el-form-item>
+          <el-form-item prop="managerPassword">
+            <el-input type="password" v-model="systemLoginForm.managerPassword" placeholder="密码" style="width: 23.2rem"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="login" style="width: 23.2rem">登陆</el-button>
+          </el-form-item>
+        </el-form>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
-export default {
-
-  data () {
-    return {
-      data: {
-        body: {
-          username: null,
-          password: null
+  import axios from 'axios'
+  export default {
+    components: {
+      axios
+    },
+    data () {
+      return {
+        systemManager: {},
+        authorization: '',
+        /** 运营管理人员登陆表单 */
+        systemLoginForm: {
+          managerAccount: '',
+          managerPassword: ''
         },
-        rememberMe: false
-      },
-      error: null
-    }
-  },
-  mounted () {
-    if (this.$auth.redirect()) {
-      console.log('Redirect from: ' + this.$auth.redirect().from.name)
-    }
-    // Can set query parameter here for auth redirect or just do it silently in login redirect.
-  },
-  methods: {
-    login () {
-      var redirect = this.$auth.redirect()
-      this.$auth.login({
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: this.data.body,
-        rememberMe: this.data.rememberMe,
-        redirect: {name: redirect ? redirect.from.name : 'Home'},
-        success (res) {
-          console.log('Auth Success')
-          // console.log('Token: ' + this.$auth.token())
-          // console.log(res)
-        },
-        error (err) {
-          if (err.response) {
-            // The request was made, but the server responded with a status code
-            // that falls out of the range of 2xx
-            // console.log(err.response.status)
-            // console.log(err.response.data)
-            // console.log(err.response.headers)
-            this.error = err.response.data
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            console.log('Error', err.message)
-          }
-          console.log(err.config)
+        rules: {
+          managerAccount: [
+            {required: true, message: '请输入账号', trigger: 'blur'}
+          ],
+          managerPassword: [
+            {required: true, message: '请输入密码', trigger: 'blur'}
+          ]
         }
-      })
+      }
+    },
+    methods: {
+      /** 跳转界面到首页 */
+      enterHome () {
+        this.$router.push({path: '/'})
+      },
+      /** login */
+      login () {
+        this.$refs.systemLoginForm.validate((valid) => {
+          if (valid) {
+            var that = this
+            var BODY = {
+              managerAccount: that.systemLoginForm.managerAccount,
+              managerPassword: that.systemLoginForm.managerPassword
+            }
+            axios.post('/api/systemManager/systemManagerLogin', BODY, {
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'hero'
+              }
+            }).then(function (response) {
+              console.log('BBBBBBBBBBBBB')
+              if (response.data.code === 'OK') {
+                console.log('AAAAAAAAAAAAAA')
+                that.authorization = response.data.authorization
+                that.systemManager = response.data.sManager
+                window.location.reload()
+                that.enterHome()
+              }
+            }).catch(function (error) {
+              console.log(error)
+            })
+          } else {
+            console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      // 设置 cookie
+      setCookie: function (cname, cvalue, exdays) {
+        var d = new Date()
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000))
+        var expires = 'expires=' + d.toUTCString()
+        console.info(cname + '=' + cvalue + '; ' + expires)
+        document.cookie = cname + '=' + escape(cvalue) + '; ' + expires
+        console.info(document.cookie)
+      },
+      // 获取cookie
+      getCookie: function (cname) {
+        var name = cname + '='
+        var ca = document.cookie.split(';')
+        for (var i = 0; i < ca.length; i++) {
+          var c = ca[i]
+          while (c.charAt(0) === ' ') c = c.substring(1)
+          if (c.indexOf(name) !== -1) return unescape(c.substring(name.length, c.length))
+        }
+        return ''
+      },
+      // 清除cookie
+      clearCookie: function () {
+        this.setCookie('sysManagerName', '', -1)
+      }
     }
   }
-  // filters: {
-  //   json: function (value) {
-  //     console.log(value)
-  //     return value
-  //   }
-  // }
-
-}
 </script>
 
-<style lang="scss" scoped>
-.is-title {
-    text-transform: capitalize;
-}
+<style>
+
 </style>

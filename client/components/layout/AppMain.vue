@@ -38,8 +38,8 @@ export default {
 @import '~bulma/sass/utilities/mixins';
 
 .app-main {
-  padding-top: 50px;
-  margin-left: 180px;
+  padding-top: 70px;
+  margin-left: 220px;
   transform: translate3d(0, 0, 0);
 
   @include mobile() {

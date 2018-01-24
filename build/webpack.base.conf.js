@@ -62,8 +62,18 @@ module.exports = {
         loader: 'babel-loader',
         include: projectRoot,
         // /node_modules\/(?!vue-bulma-.*)/
-        exclude: [new RegExp(`node_modules\\${path.sep}(?!vue-bulma-.*)`)]
+        exclude: [new RegExp(`node_modules\\${path.sep}(vue-bulma-.*)`)]
       },
+      // {
+      //   test: /\.js$/,
+      //   exclude: /(node_modules|vue-bulma-.*)/,
+      //   use: {
+      //     loader: 'babel-loader',
+      //     options: {
+      //       presets: ['es2015']
+      //     }
+      //   }
+      // },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
@@ -79,6 +89,14 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
+      },
+      {
+        test: /\\\\\\\\.css$/,
+        loader: 'style!css'
+      },
+      {
+        test: /\\\\\\\\.(eot|woff|woff2|ttf)([\\\\\\\\?]?.*)$/,
+        loader: 'file'
       }
     ]
   },

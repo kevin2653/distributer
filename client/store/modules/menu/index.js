@@ -1,10 +1,11 @@
 import * as types from '../../mutation-types'
 import lazyLoading from './lazyLoading'
-import charts from './charts'
-import uifeatures from './uifeatures'
-import components from './components'
+import distributer from './distributer'
+import line from './line'
+import visa from './visa'
 import tables from './tables'
-
+import commission from './commission'
+import system from './system'
 // show: meta.label -> name
 // name: component name
 // meta.label: display label
@@ -12,28 +13,20 @@ import tables from './tables'
 const state = {
   items: [
     {
-      name: 'Dashboard',
-      path: '/dashboard',
+      name: '首页',
+      path: '/',
       meta: {
         icon: 'fa-tachometer',
-        link: 'dashboard/index.vue'
+        link: 'Home.vue'
       },
-      component: lazyLoading('dashboard', true)
+      component: lazyLoading('Home', true)
     },
-    {
-      name: 'Axios',
-      path: '/axiosDemo',
-      meta: {
-        auth: true,
-        icon: 'fa-rocket',
-        link: 'axios/index.vue'
-      },
-      component: lazyLoading('axios', true)
-    },
-    charts,
-    uifeatures,
-    components,
-    tables
+    distributer,
+    line,
+    visa,
+    tables,
+    commission,
+    system
   ]
 }
 
