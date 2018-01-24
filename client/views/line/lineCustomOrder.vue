@@ -38,8 +38,8 @@
         </el-col>
         <el-col :span="8">
           <div class="grid-content bg-purple">
-            <el-form-item label="下单时间">
-              <el-date-picker type="date" placeholder="开始时间" format="yyyy-MM-dd" value-format="yyyy-MM-dd" v-model="lineOrder.addTime" style="width: 10rem">
+            <el-form-item label="创建时间">
+              <el-date-picker type="date" placeholder="开始时间" format="yyyy-MM-dd" value-format="yyyy-MM-dd" v-model="lineOrder.startTime" style="width: 10rem">
               </el-date-picker>
               <label>-</label>
               <el-date-picker
@@ -56,7 +56,7 @@
         <el-col :span="5">
           <div class="grid-content bg-purple" style="margin-left: 27px">
             <el-form-item label="团号">
-              <el-input v-model="lineOrder.tourGroup" style="width: 10rem"></el-input>
+              <el-input v-model="lineOrder.teamId" style="width: 10rem"></el-input>
             </el-form-item>
           </div>
         </el-col>
@@ -79,7 +79,7 @@
         <el-col :span="6">
           <div class="grid-content bg-purple">
             <el-form-item label="运营负责人">
-              <el-select v-model="lineOrder.operationId" placeholder="请选择" style="width: 10rem">
+              <el-select v-model="lineOrder.operatorId" placeholder="请选择" style="width: 10rem">
                 <el-option
                   v-for="item in managerOp"
                   :key="item.managerId"
@@ -122,21 +122,21 @@
           <el-table :data="orderData" tooltip-effect="dark" @selection-change="handleSelectionChange" border style="width: 100%" >
             <el-table-column type="selection" label="全选" width="55">
             </el-table-column>
-            <el-table-column label="订单编号" prop="ordersn" align="center">
+            <el-table-column label="订单编号" prop="requirementId" align="center">
             </el-table-column>
-            <el-table-column label="目的地" align="center">
+            <el-table-column label="目的地" prop="destination" align="center">
             </el-table-column>
             <el-table-column label="联系人姓名" prop="linkMan" align="center">
             </el-table-column>
             <el-table-column label="联系电话" prop="linkTel" align="center">
             </el-table-column>
-            <el-table-column label="临时团号" prop="tourGroup" align="center">
+            <el-table-column label="临时团号" prop="team_id" align="center">
             </el-table-column>
-            <el-table-column label="需求创建时间" align="center">
+            <el-table-column label="需求创建时间" prop="createTime" align="center">
             </el-table-column>
-            <el-table-column label="代理商名称" prop="distributerId" align="center">
+            <el-table-column label="代理商名称" prop="distributerName" align="center">
             </el-table-column>
-            <el-table-column label="运营负责人" prop="operationId" align="center">
+            <el-table-column label="运营负责人" prop="operatorName" align="center">
             </el-table-column>
             <el-table-column align="center" width="240" label="操作">
               <template slot-scope="scope" center>
@@ -268,14 +268,14 @@
           label: '是'
         }],
         /** 运营人员 */
-        managerOp: [{}],
+        managerOp: [],
         /** 多选框 */
         multipleSelection: [],
         /** 头部信息 */
         authorization: '',
         /** 代理商弹框表格 */
-        tableData: [{}],
-        disLikeTableData: [{}],
+        tableData: [],
+        disLikeTableData: [],
         /** 代理商模糊查询 */
         disName: '',
         /** 代理商详情 */
@@ -293,16 +293,16 @@
         /** 关联订单号 */
         ordersn: '',
         /** 关联线路产品弹框表格 */
-        lineData: [{}],
+        lineData: [],
         lineLikeData: [],
         totalNum: 0, /** 查询总条数 */
         /** form表单数据 */
         lineOrder: {
           distributerId: '', /** 代理商id */
-          tourGroup: '', /** 团号 */
-          operationId: '', /** 运营管理人员 */
+          teamId: '', /** 临时团号 */
+          operatorId: '', /** 运营管理人员 */
           isBeenManage: '', /** 是否分配运营负责人 */
-          addTime: '', /** 下单开始时间 */
+          startTime: '', /** 下单开始时间 */
           endTime: '', /** 下单结束时间 */
           pageIndex: 1, /** 当前页 */
           pageSize: 5 /** 每页显示条数 */
@@ -347,7 +347,7 @@
       },
       /** 查看详情 */
       seeDetails (index, row) {
-        this.$router.push({name: '定制需求详情', params: {ordersn: row.ordersn, authorization: this.authorization}})
+        this.$router.push({name: '定制需求详情', params: {customDetails: row}})
         console.log(row)
       },
       /** 关联线路 */
@@ -405,19 +405,18 @@
       onSubmit () {
         var that = this
         var BODY = {
-          type: 100, // 产品类型(定制需求订单)
           distributerId: that.lineOrder.distributerId, // 代理商id
-          tourGroup: that.lineOrder.tourGroup, // 团号
-          operationId: that.lineOrder.operationId, // 运营人员
+          teamId: that.lineOrder.teamId, // 团号
+          operatorId: that.lineOrder.operatorId, // 运营人员
           isBeenManage: that.lineOrder.isBeenManage, // 是否分配运营人员
-          addTime: that.lineOrder.addTime,  // 下单开始时间
+          startTime: that.lineOrder.startTime,  // 下单开始时间
           endTime: that.lineOrder.endTime, // 下单结束时间
           pageIndex: that.lineOrder.pageIndex,
           pageSize: that.lineOrder.pageSize
         }
         console.log('当前表单数据')
         console.log(BODY)
-        axios.post(api + 'distrbuter/admin/order/list', BODY, {
+        axios.post(api + 'distrbuter/admin/customized/list', BODY, {
           headers: {
             'Authorization': 'Sys ' + that.getCookie('authorization'),
             'Content-Type': 'application/json'
@@ -425,19 +424,19 @@
         }).then(function (response) {
           console.log('开始查询表单')
           console.log(response.data)
-          that.orderData = response.data.orderList
-          that.totalNum = response.data.orderList.length
+          that.orderData = response.data.list
+          that.totalNum = response.data.totalNum
           for (var i = 0; i < that.orderData.length; i++) {
-//            that.orderData[i].amount = (that.orderData[i].amount) / 100
+            that.orderData[i].amount = (that.orderData[i].amount) / 100
             for (var j = 0; j < that.tableData.length; j++) {
               if (that.orderData[i].distributerId === that.tableData[j].distributerId) {
-                that.orderData[i].distributerId = that.tableData[j].distributerName
+                that.orderData[i].distributerName = that.tableData[j].distributerName
               }
             }
-            var num = Number(that.orderData[i].operationId)
+//            var num = Number(that.orderData[i].operationId)
             for (var k = 0; k < that.managerOp.length; k++) {
-              if (num === that.managerOp[k].managerId) {
-                that.orderData[i].operationId = that.managerOp[k].managerName
+              if (that.orderData[i].operatorId === that.managerOp[k].managerId) {
+                that.orderData[i].operatorName = that.managerOp[k].managerName
               }
             }
           }

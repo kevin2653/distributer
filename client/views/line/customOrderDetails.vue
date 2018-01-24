@@ -19,8 +19,7 @@
               {{orderDetails.linkEmail}}
             </el-form-item>
             <el-form-item label="微信号:">
-              <!--{{orderDetails.linkEmail}}-->
-              xxxxxx
+              {{orderDetails.weixin}}
             </el-form-item>
           </div>
           <br>
@@ -29,58 +28,59 @@
           </div>
           <div>
             <el-form-item label="订单编号:">
-              {{orderDetails.ordersn}}
+              {{orderDetails.requirementId}}
             </el-form-item>
             <el-form-item label="需求创建时间:">
-              <!--{{orderDetails.ordersn}}-->
+              {{orderDetails.createTime}}
             </el-form-item>
             <el-form-item label="目的地:">
-              <!--{{orderDetails.ordersn}}-->
+              {{orderDetails.destination}}
             </el-form-item>
             <el-form-item label="出行天数:">
-              <!--{{orderDetails.ordersn}}-->
+              {{orderDetails.dayNum}}
             </el-form-item>
             <el-form-item label="临时团号:">
-              {{orderDetails.tourGroup}}
+              {{orderDetails.team_id}}
             </el-form-item>
             <el-form-item label="出行人数:">
-              {{travelerNum}}
+              <!--+ orderDetails.tourers.subNum.old-->
+              {{orderDetails.tourersNum}}
             </el-form-item>
             <el-form-item label="出发日期:">
               {{orderDetails.travelDate}}
             </el-form-item>
             <el-form-item label="返回日期:">
-              {{orderDetails.travelDate}}
+              {{orderDetails.endDate}}
             </el-form-item>
             <el-form-item label="出发城市:">
-              <!--{{orderDetails.cancel_status}}-->
+              {{orderDetails.fromCity}}
             </el-form-item>
             <el-form-item label="抵达城市:">
-              <!--{{orderDetails.cancel_type}}-->
+              {{orderDetails.toCity}}
             </el-form-item>
             <el-form-item label="特色景点:">
-              <!--{{orderDetails.cancel_reason}}-->
+              {{orderDetails.characteristic}}
             </el-form-item>
             <el-form-item label="机票要求:">
-              <!--{{orderBill.type}}-->
+              {{orderDetails.planeClaim}}
             </el-form-item>
             <el-form-item label="酒店要求:">
-              <!--{{orderBill.title}}-->
+              {{orderDetails.hotelClaim}}
             </el-form-item>
             <el-form-item label="车辆要求:">
-              <!--{{orderBill.taxNum}}-->
+              {{orderDetails.carClaim}}
             </el-form-item>
             <el-form-item label="餐食要求:">
-              <!--{{orderDetails.receiverName}}-->
+              {{orderDetails.foodClaim}}
             </el-form-item>
             <el-form-item label="公务活动:">
-              <!--{{orderDetails.receiverTel}}-->
+              {{orderDetails.activity.title}}
             </el-form-item>
             <el-form-item label="邀请函:">
-              <!--{{orderDetails.receiverAddress}}-->
+              {{orderDetails.InvitationCard}}
             </el-form-item>
             <el-form-item label="签证要求:">
-              客人自备
+              {{orderDetails.visaClaim}}
             </el-form-item>
           </div>
           <br>
@@ -164,24 +164,124 @@
           settingPrice: false,   /** 价格设置弹窗 */
           paySuccess: false    /** 支付成功弹窗 */
         },
-        /** 当前订单号 */
-        ordersn: '',
-        /** 当前请求头 */
-        authorization: '',
         /** 出行人数 */
         travelerNum: '',
         /** 当前订单详情 */
         orderDetails: {},
         /** 定制需求支付表单 */
-        customOrderPayForm: {}
+        customOrderPayForm: {},
+        /** 下拉框管理 */
+        selectM: {
+          /** 机型 */
+          modelOp: [{
+            value: '1',
+            label: '直达'
+          }, {
+            value: '2',
+            label: '转机'
+          }, {
+            value: '99',
+            label: '无需求'
+          }],
+          /** 仓位 */
+          cabinOp: [{
+            value: '1',
+            label: '经济舱'
+          }, {
+            value: '2',
+            label: '公务舱'
+          }, {
+            value: '3',
+            label: '头等舱'
+          }],
+          /** 酒店类型 */
+          hotelTypeOp: [{
+            value: '1',
+            label: '国家连锁'
+          }, {
+            value: '2',
+            label: '常规15km'
+          }, {
+            value: '3',
+            label: '市区10km'
+          }, {
+            value: '4',
+            label: '市中心5km'
+          }, {
+            value: '99',
+            label: '无需求'
+          }],
+          /** 酒店星级 */
+          hotelStarOp: [{
+            value: '1',
+            label: '三星级'
+          }, {
+            value: '2',
+            label: '四星级'
+          }, {
+            value: '3',
+            label: '五星级'
+          }],
+          /** 酒店客房标准 */
+          hotelRoomStandOp: [{
+            value: '1',
+            label: '标准双人间'
+          }, {
+            value: '2',
+            label: '单间'
+          }, {
+            value: '3',
+            label: '套房'
+          }],
+          /** 车辆要求 */
+          carStandOp: [{
+            value: '1',
+            label: '司导分离'
+          }, {
+            value: '2',
+            label: '司兼导'
+          }],
+          /** 活动邀请函 */
+          invitationOp: [{
+            value: '1',
+            label: '邀请函客人自备'
+          }, {
+            value: '2',
+            label: '邀请函我司提供'
+          }],
+          /** 签证原因 */
+          visaReasionOp: [{
+            value: '1',
+            label: '因公'
+          }, {
+            value: '2',
+            label: '因私'
+          }],
+          /** 签证类型 */
+          visaTypeOp: [{
+            value: '1',
+            label: '个人旅游签证'
+          }, {
+            value: '2',
+            label: 'ADS团队旅游签'
+          }, {
+            value: '3',
+            label: '商签'
+          }]
+        }
       }
     },
     created: function () {
-      this.ordersn = this.$route.params.ordersn
-      this.authorization = this.$route.params.authorization
-      console.log(this.ordersn)
-      console.log(this.authorization)
-      this.orderDataGet()
+      this.orderDetails = this.$route.params.customDetails
+      this.orderDataGet(this.orderDetails)
+    },
+    mounted: function () {
+//      if (typeof this.$route.params.orderDetails === 'undefined') {
+//        this.$router.push({name: '定制需求订单管理'})
+//      } else {
+//        this.orderDetails = this.$route.params.customDetails
+//        this.orderDataGet(this.orderDetails)
+//      }
     },
     updated: function () {
     },
@@ -199,33 +299,93 @@
       },
       /** 编辑定制需求 */
       editCustomOrder () {
-        this.$router.push({name: '编辑定制需求', params: {ordersn: this.ordersn, authorization: this.authorization}})
+        this.$router.push({name: '编辑定制需求', params: {orderDetails: this.orderDetails}})
       },
       /** 定制需求订单支付 */
       customOrderPay () {
         this.dialogM.orderPayDialog = true
       },
       /** 进入界面即加载 */
-      orderDataGet: function () {
-        var that = this
-        /** 获取订单详情产品 */
-        axios.get('https://qa-api.yuelvhui.com/distrbuter/admin/order/detail/' + that.ordersn, {
-          headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
-            'Content-Type': 'application/json'
+      orderDataGet (orderDetails) {
+        orderDetails.dayNum = orderDetails.day + '天'
+        if (typeof orderDetails.tourers.subNum.old === 'undefined') {
+          orderDetails.tourersNum = orderDetails.tourers.subNum.adult + '成人' + orderDetails.tourers.subNum.child + '儿童'
+        } else {
+          orderDetails.tourersNum = orderDetails.tourers.subNum.adult + '成人' + orderDetails.tourers.subNum.child + '儿童' + orderDetails.tourers.subNum.old + '老人'
+        }
+        orderDetails.planeClaim = ''
+        // 机票要求
+        for (var i = 0; i < this.selectM.cabinOp.length; i++) {
+          if (Number(this.selectM.cabinOp[i].value) === orderDetails.planeTicket.ShippingSpace) {
+            orderDetails.planeClaim = orderDetails.planeClaim + this.selectM.cabinOp[i].label
           }
-        }).then(function (response) {
-          console.log('开始接收数据')
-          that.orderDetails = response.data
-          that.orderBill = response.data.orderBill
-          that.travelerTable = response.data.tourers.list
-          that.travelerNum = response.data.tourers.subNum.adult + '成人' + response.data.tourers.subNum.child + '儿童'
-          that.orderDetails.amount = ((response.data.amount) / 100) + '元' + '(含单房差：' + (response.data.amountDetail.roombalance) / 100 + '元)'
-          console.log(that.orderDetails)
-          console.log('接收数据结束')
-        }).catch(function (error) {
-          console.log(error)
-        })
+        }
+        for (var m = 0; m < this.selectM.modelOp.length; m++) {
+          if (Number(this.selectM.modelOp[m].value) === orderDetails.planeTicket.type) {
+            orderDetails.planeClaim = orderDetails.planeClaim + '/' + this.selectM.modelOp[m].label
+          }
+        }
+        if (orderDetails.planeTicket.appoint !== null) {
+          orderDetails.planeClaim = orderDetails.planeClaim + '/' + orderDetails.planeTicket.appoint
+        }
+        // 酒店要求
+        orderDetails.hotelClaim = ''
+        for (var j = 0; j < this.selectM.hotelStarOp.length; j++) {
+          if (Number(this.selectM.hotelStarOp[j].value) === orderDetails.hotel.stars) {
+            orderDetails.hotelClaim = orderDetails.hotelClaim + this.selectM.hotelStarOp[j].label
+          }
+        }
+        for (var l = 0; l < this.selectM.hotelRoomStandOp.length; l++) {
+          if (Number(this.selectM.hotelRoomStandOp[l].value) === orderDetails.hotel.roomStandard) {
+            orderDetails.hotelClaim = orderDetails.hotelClaim + '/' + this.selectM.hotelRoomStandOp[l].label
+          }
+        }
+        for (var k = 0; k < this.selectM.hotelTypeOp.length; k++) {
+          if (Number(this.selectM.hotelTypeOp[k].value) === orderDetails.hotel.type) {
+            orderDetails.hotelClaim = orderDetails.hotelClaim + '/' + this.selectM.hotelTypeOp[k].label
+          }
+        }
+        if (orderDetails.hotel.appoint !== null) {
+          orderDetails.hotelClaim = orderDetails.hotelClaim + '/' + orderDetails.hotel.appoint
+        }
+        // 车辆要求
+        orderDetails.carClaim = ''
+        orderDetails.carClaim = orderDetails.cars.sites + '座'
+        if (orderDetails.cars.appoint !== null) {
+          orderDetails.carClaim = orderDetails.carClaim + orderDetails.cars.appoint
+        }
+        for (var n = 0; n < this.selectM.carStandOp.length; n++) {
+          if (Number(this.selectM.carStandOp[n].value) === orderDetails.cars.type) {
+            orderDetails.carClaim = orderDetails.carClaim + '/' + this.selectM.carStandOp[n].label
+          }
+        }
+        if (orderDetails.cars.appoint !== null) {
+          orderDetails.carClaim = orderDetails.carClaim + '/' + orderDetails.cars.appoint
+        }
+        // 餐食要求
+        orderDetails.foodClaim = orderDetails.food.courses + '菜/' + orderDetails.food.soups + '汤/' + orderDetails.food.characteristic + '次特色餐'
+        if (orderDetails.food.appoint !== null) {
+          orderDetails.foodClaim = orderDetails.foodClaim + '/' + orderDetails.food.appoint
+        }
+        // 邀请函
+        orderDetails.InvitationCard = ''
+        for (var q = 0; q < this.selectM.invitationOp.length; q++) {
+          if (Number(this.selectM.invitationOp[q].value) === orderDetails.activity.InvitationType) {
+            orderDetails.InvitationCard = this.selectM.invitationOp[q].label
+          }
+        }
+        // 签证要求
+        orderDetails.visaClaim = ''
+        for (var w = 0; w < this.selectM.visaReasionOp.length; w++) {
+          if (Number(this.selectM.visaReasionOp[w].value) === orderDetails.visa.reason) {
+            orderDetails.visaClaim = orderDetails.visaClaim + this.selectM.visaReasionOp[w].label
+          }
+        }
+        for (var r = 0; r < this.selectM.visaTypeOp.length; r++) {
+          if (Number(this.selectM.visaTypeOp[r].value) === orderDetails.visa.type) {
+            orderDetails.visaClaim = orderDetails.visaClaim + '/' + this.selectM.visaTypeOp[r].label
+          }
+        }
       }
     }
   }
