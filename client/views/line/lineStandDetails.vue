@@ -2,6 +2,9 @@
   <div style="background-color: #f2f2f2" align="center">
     <div style="background-color: #ffffff;width:90%" align="left">
       <br>
+      <div style="margin-right: 5rem" align="right">
+        <a @click="returnToUpLevel">返回</a>
+      </div>
       <div style="width: 95%;margin-left: 3rem">
         <el-form label-width="200px">
           <div>
@@ -70,10 +73,10 @@
               {{orderDetails.receiverAddress}}
             </el-form-item>
             <el-form-item label="线路运营负责人:">
-              <!--{{orderDetails.receiverAddress}}-->
+              {{orderDetails.operatorName}}
             </el-form-item>
             <el-form-item label="代理商名称:">
-              {{orderDetails.distributerId}}
+              {{orderDetails.distributerName}}
             </el-form-item>
             <el-form-item label="代理商结算状态:">
               {{disSettleStatus}}
@@ -92,7 +95,7 @@
               <!--{{distrubuterInfo.contactName}}-->
             </el-form-item>
             <el-form-item label="订单金额:">
-              {{orderDetails.amount}}
+              {{orderDetails.amountStr}}
             </el-form-item>
             <el-form-item label="支付金额:">
               <!--{{orderDetails.amount}}-->
@@ -228,6 +231,10 @@
         }
         return ''
       },
+      /** 返回上一层 */
+      returnToUpLevel () {
+        this.$router.push({path: 'line/lineStandOrder', query: {lineOrder: this.$route.query.lineOrder}})
+      },
       /** 进入界面即加载 */
       orderDataGet: function () {
         var that = this
@@ -266,21 +273,21 @@
           that.orderDetails = response.data
           that.orderBill = response.data.orderBill
           that.travelerTable = response.data.tourers.list
-          that.travelerNum = response.data.tourers.subNum.adult + '成人' + response.data.tourers.subNum.child + '儿童'
-          that.orderDetails.amount = ((response.data.amount) / 100) + '元' + '(含单房差：' + (response.data.amountDetail.roombalance) / 100 + '元)'
+          that.travelerNum = response.data.tourers.subNum.adult + '成人' + response.data.tourers.subNum.child + '儿童' + response.data.tourers.subNum.old + '老人'
+          that.orderDetails.amountStr = ((response.data.amount) / 100) + '元' + '(含单房差：' + (response.data.amountDetail.roombalance) / 100 + '元)'
           that.distributerId = that.orderDetails.distributerId
           that.disOrderStatus(that.distributerId)
           for (var i = 0; i < that.distributerData.length; i++) {
             if (that.distributerData[i].distributerId === that.orderDetails.distributerId) {
-              that.orderDetails.distributerId = that.distributerData[i].distributerName
+              that.orderDetails.distributerName = that.distributerData[i].distributerName
             }
           }
           // 转换运营负责人名称
-//          for (var j = 0; j < that.managerOp.length; j++) {
-//            if (that.managerOp[j].managerId === that.orderDetails.operationId) {
-//              that.orderDetails.operationId = that.managerOp[j].managerName
-//            }
-//          }
+          for (var j = 0; j < that.managerOp.length; j++) {
+            if (that.managerOp[j].managerId === that.orderDetails.operatorId) {
+              that.orderDetails.operatorName = that.managerOp[j].managerName
+            }
+          }
           console.log(that.orderDetails)
           console.log('接收数据结束')
         }).catch(function (error) {

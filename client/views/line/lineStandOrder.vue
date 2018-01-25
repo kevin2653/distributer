@@ -221,15 +221,15 @@
             </el-table-column>
             <el-table-column label="联系电话" prop="linkTel" width="110" align="center">
             </el-table-column>
-            <el-table-column label="订单金额(元)" prop="amount" width="110" align="center">
+            <el-table-column label="订单金额(元)" prop="amountStr" width="110" align="center">
             </el-table-column>
             <el-table-column label="订单状态" prop="statusStr" align="center">
             </el-table-column>
             <el-table-column label="订单创建时间" prop="addTime" width="130" align="center">
             </el-table-column>
-            <el-table-column label="代理商名称" prop="distributerId" align="center">
+            <el-table-column label="代理商名称" prop="distributerName" align="center">
             </el-table-column>
-            <el-table-column label="运营负责人" prop="operationId" align="center">
+            <el-table-column label="运营负责人" prop="operatorName" align="center">
             </el-table-column>
             <el-table-column align="center" width="340" label="操作">
               <template slot-scope="scope" center>
@@ -252,7 +252,7 @@
         :page-sizes="[3, 5, 7, 9]"
         :page-size=lineOrder.pageSize
         layout="total, sizes, prev, pager, next, jumper"
-        :total=totalPage>
+        :total=totalNum>
       </el-pagination>
      </div>
       <!--取消订单弹窗-->
@@ -365,7 +365,7 @@
         /** 取消订单时选中的订单号 */
         ordersn: '',
         /** 数据总条数 */
-        totalPage: 0,
+        totalNum: 0,
         /** 代理商弹框 */
         dialogDistributer: false,
         /** 产品弹框 */
@@ -401,7 +401,8 @@
         /** 头部信息 */
         authorization: '',
         /** 代理商弹框表格 */
-        tableData: [{}],
+        tableData: [],
+        disLikeTableData: [],
         /** 多选框 */
         multipleSelection: [],
         /** 线路订单表格 */
@@ -453,6 +454,10 @@
       }
     },
     created: function () {
+      if (typeof this.$route.query.lineOrder !== 'undefined') {
+        this.lineOrder = JSON.parse(this.$route.query.lineOrder)
+        this.onSubmit()
+      }
       this.dataGet()
     },
     updated: function () {
@@ -511,7 +516,7 @@
         }
         console.log(ordersn)
         var BODY = {
-          ordersn: ordersn,
+          ordersns: ordersn,
           statusId: that.statusId
         }
         axios.post(api + 'distrbuter/admin/order/updateStatus', BODY, {
@@ -565,7 +570,7 @@
       },
       /** 查看详情 */
       seeDetails (index, row) {
-        this.$router.push({path: '/line/lineStandOrder/lineStandDetails', query: {ordersn: row.ordersn}})
+        this.$router.push({path: '/line/lineStandOrder/lineStandDetails', query: {ordersn: row.ordersn, lineOrder: JSON.stringify(this.lineOrder)}})
         console.log(row)
       },
       /** 取消订单 */
@@ -623,7 +628,7 @@
         var that = this
         var BODY = {
           ordersn: that.orderClaimForm.ordersn,
-          operationId: that.orderClaimForm.operationId
+          operatorId: that.orderClaimForm.operationId
         }
         axios.post(api + 'distrbuter/admin/order/setOperationManager', BODY, {
           headers: {
@@ -642,7 +647,7 @@
                 for (var j = 0; j < that.managerOp.length; j++) {
                   if (that.orderClaimForm.operationId === that.managerOp[j].managerId) {
                     console.log('命名成功')
-                    that.orderData[i].operationId = that.managerOp[j].managerName
+                    that.orderData[i].operatorName = that.managerOp[j].managerName
                     that.orderClaimForm.ordersn = ''
                     that.orderClaimForm.operationId = ''
                     that.orderClaimForm.pName = ''
@@ -697,14 +702,14 @@
       onSubmit () {
         var that = this
         var BODY = {
-          type: 1, // 产品类型
+//          type: 1, // 产品类型
           distributerId: that.lineOrder.distributerId, // 代理商id
           keyword: that.lineOrder.keyword, // 订单状态
           tourGroup: that.lineOrder.tourGroup, // 团号
-          operationId: that.lineOrder.operationId, // 运营人员
+          operatorId: that.lineOrder.operationId, // 运营人员
           pid: that.lineOrder.pid, // 产品id
           isBeenManage: that.lineOrder.isBeenManage, // 是否分配运营人员
-          addTime: that.lineOrder.addTime,  // 下单开始时间
+          startTime: that.lineOrder.addTime,  // 下单开始时间
           endTime: that.lineOrder.endTime, // 下单结束时间
           pageIndex: that.lineOrder.pageIndex,
           pageSize: that.lineOrder.pageSize
@@ -720,18 +725,18 @@
           console.log('开始查询表单')
           console.log(response.data)
           that.orderData = response.data.orderList
-          that.totalPage = response.data.orderList.length
+          that.totalNum = response.data.totalNum
           for (var i = 0; i < that.orderData.length; i++) {
-            that.orderData[i].amount = (that.orderData[i].amount) / 100
+            that.orderData[i].amountStr = (that.orderData[i].amount) / 100
             for (var j = 0; j < that.tableData.length; j++) {
               if (that.orderData[i].distributerId === that.tableData[j].distributerId) {
-                that.orderData[i].distributerId = that.tableData[j].distributerName
+                that.orderData[i].distributerName = that.tableData[j].distributerName
               }
             }
-            var num = Number(that.orderData[i].operationId)
+            var num = Number(that.orderData[i].operatorId)
             for (var k = 0; k < that.managerOp.length; k++) {
               if (num === that.managerOp[k].managerId) {
-                that.orderData[i].operationId = that.managerOp[k].managerName
+                that.orderData[i].operatorName = that.managerOp[k].managerName
               }
             }
           }
@@ -764,17 +769,13 @@
       /** input改变，模糊查询代理商 */
       inputChangeDis () {
         var that = this
-        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {distributerName: that.disName}, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+        for (var i = 0; i < that.tableData.length; i++) {
+          if (that.tableData[i].distributerName.indexOf(that.disName) > -1) {
+            that.disLikeTableData.push(that.tableData[i])
           }
-        }).then(function (response) {
-          that.tableData = response.data.listDto
-          that.managerData = ''
-        }).catch(function (error) {
-          console.log(error)
-        })
+        }
+        console.log(that.disLikeTableData)
+        that.tableData = that.disLikeTableData
       },
       /** input改变，查询产品 */
       inputChangePro () {
@@ -827,32 +828,26 @@
       /** 选择代理商显示详情 */
       rowClickDistributer (row) {
         var that = this
-        axios.get('/api/distributerInfo/findDistributerInfoById?distributerId=' + row.distributerId, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+        for (var i = 0; i < that.tableData.length; i++) {
+          if (that.tableData[i].distributerId === row.distributerId) {
+            if (that.tableData[i].distributerName === '悦旅会') {
+              that.distributerData.distributerName = '悦旅会'
+              that.distributerData.distributerCode = '无'
+              that.managerData = '无'
+            } else {
+              that.distributerData = that.tableData[i]
+              that.managerData = that.tableData[i].sManager.managerName
+            }
           }
-        }).then(function (response) {
-          if (response.data.distributerId === null) {
-            that.distributerData.distributerName = '悦旅会'
-            that.distributerData.distributerCode = '无'
-            that.managerData = '无'
-          } else {
-            that.distributerData = response.data
-            that.managerData = response.data.sManager.managerName
-          }
-          that.lineOrder.distributerId = row.distributerId
-        }).catch(function (error) {
-          console.log(error)
-        })
-//        console.log('选择行结束')
+        }
+        that.lineOrder.distributerId = row.distributerId
       },
       /** 获取线路产品 */
-      proData (authorization) {
+      proData () {
         var that = this
         axios.get(api + "distrbuter/product/list/1/''", {
           headers: {
-            'Authorization': authorization,
+            'Authorization': 'Sys ' + that.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -872,8 +867,8 @@
           }
         }).then(function (response) {
           that.managerOp = response.data.systemManagerDTOList
-          that.authorization = response.data.authorization
-          that.proData(that.authorization)
+//          that.authorization = response.data.authorization
+          that.proData()
 //          console.log(that.managerOp)
         }).catch(function (error) {
           console.log(error)
