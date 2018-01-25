@@ -117,7 +117,7 @@
       }
     },
     created: function () {
-      this.ordersn = this.$route.params.ordersn
+      this.ordersn = this.$route.query.ordersn
       this.orderDataGet()
 //      this.areaGet()
 //      this.dataGet()
@@ -127,7 +127,7 @@
     methods: {
       /** 上传资料 */
       uploadData () {
-        this.$router.push({name: '上传资料'})
+        this.$router.push({path: '/visa/visaOrderManage/visaOrderDetails/uploadData'})
       },
       // 获取cookie
       getCookie: function (cname) {

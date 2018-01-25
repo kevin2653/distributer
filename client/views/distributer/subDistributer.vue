@@ -60,27 +60,27 @@
                          class="selWidth">
                 <el-option
                   v-for="item in provinceOp"
-                  :key="item.areaId"
-                  :label="item.areaName"
-                  :value="item.areaId">
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
                 </el-option>
               </el-select>
               <label>-</label>
               <el-select v-model="distributerInfoDTO.cityId" @change="dataCoArea" placeholder="市" class="selWidth">
                 <el-option
                   v-for="item in cityOp"
-                  :key="item.areaId"
-                  :label="item.areaName"
-                  :value="item.areaId">
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
                 </el-option>
               </el-select>
               <label>-</label>
               <el-select v-model="distributerInfoDTO.countyId" placeholder="县" class="selWidth">
                 <el-option
                   v-for="item in countyOp"
-                  :key="item.areaId"
-                  :label="item.areaName"
-                  :value="item.areaId">
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -176,14 +176,14 @@
       return {
         dialogVisible: false,
         totalPage: 0,
-        gradeOp: [{}],
-        channelOp: [{}],
-        provinceOp: [{}],
-        cityOp: [{}],
-        countyOp: [{}],
+        gradeOp: [],
+        channelOp: [],
+        provinceOp: [],
+        cityOp: [],
+        countyOp: [],
         ContableData: [],
-        areaData: [{}],
-        tableData: [{}],
+        areaData: [],
+        tableData: [],
         name: '',
         id: '',
         distributerData: {},
@@ -204,10 +204,10 @@
       }
     },
     created: function () {
-      this.distributerInfoDto = this.$route.params.distributerInfoDTO
-      this.id = this.$route.params.distributerPid
+      this.distributerInfoDto = JSON.parse(this.$route.query.distributerInfoDTO)
+      this.id = this.$route.query.distributerPid
       this.dataGet()
-      this.dataProArea(37)
+//      this.dataProArea(37)
       this.areaGet()
       this.onSubmit()
     },
@@ -216,7 +216,7 @@
     methods: {
       /** 返回上一层 */
       returnToUpLevel () {
-        this.$router.push({name: '代理商列表', params: {distributerId: this.id, distributerInfoDTO: this.distributerInfoDto}})
+        this.$router.push({path: '/distributer/distributerList', query: {distributerId: this.id, distributerInfoDTO: JSON.stringify(this.distributerInfoDto)}})
       },
       // 获取cookie
       getCookie: function (cname) {
@@ -291,10 +291,16 @@
         axios.get(Vue.prototype.api + 'common/search/getChinaAreas', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': that.getCookie('authorization')
+            'Authorization': 'Sys ' + that.getCookie('authorization')
           }
         }).then(function (response) {
           that.areaData = response.data
+          for (var k = 0; k < that.areaData.length; k++) {
+            if (that.areaData[k].pid === 37) {
+              that.provinceOp.push(that.areaData[k])
+//              that.provinceBOp.push(that.areaData[k])
+            }
+          }
           console.log('省市县名称')
         }).catch(function (error) {
           console.log(error)
@@ -303,7 +309,7 @@
       /** form表单提交 */
       onSubmit () {
         var that = this
-        if (that.$route.params.distributerPid > 0) {
+        if (that.$route.query.distributerPid > 0) {
           var BODY = {
             distributerId: that.distributerInfoDTO.distributerId,
             channelId: that.distributerInfoDTO.channelId,
@@ -408,47 +414,43 @@
           console.log(error)
         })
       },
-      /** 获取省 */
-      dataProArea: function (value) {
-        var that = this
-        axios.get(Vue.prototype.api + 'common/search/getInternalArea/' + value, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Sys ' + that.getCookie('authorization')
-          }
-        }).then(function (response) {
-          that.provinceOp = response.data
-        }).catch(function (error) {
-          console.log(error)
-        })
-      },
+//      /** 获取省 */
+//      dataProArea: function (value) {
+//        var that = this
+//        axios.get(Vue.prototype.api + 'common/search/getInternalArea/' + value, {
+//          headers: {
+//            'Content-Type': 'application/x-www-form-urlencoded',
+//            'Authorization': 'Sys ' + that.getCookie('authorization')
+//          }
+//        }).then(function (response) {
+//          that.provinceOp = response.data
+//        }).catch(function (error) {
+//          console.log(error)
+//        })
+//      },
       /** 获取联系市 */
       dataCiArea: function (value) {
         var that = this
-        axios.get(Vue.prototype.api + 'common/search/getInternalArea/' + value, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Sys ' + that.getCookie('authorization')
+        that.cityOp = []
+        that.countyOp = []
+        that.distributerInfoDTO.cityId = ''
+        that.distributerInfoDTO.countyId = ''
+        for (var i = 0; i < that.areaData.length; i++) {
+          if (that.areaData[i].pid === value) {
+            that.cityOp.push(that.areaData[i])
           }
-        }).then(function (response) {
-          that.cityOp = response.data
-        }).catch(function (error) {
-          console.log(error)
-        })
+        }
       },
       /** 获取联系县 */
       dataCoArea: function (value) {
         var that = this
-        axios.get(Vue.prototype.api + 'common/search/getInternalArea/' + value, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Sys ' + that.getCookie('authorization')
+        that.countyOp = []
+        that.distributerInfoDTO.countyId = ''
+        for (var i = 0; i < that.areaData.length; i++) {
+          if (that.areaData[i].pid === value) {
+            that.countyOp.push(that.areaData[i])
           }
-        }).then(function (response) {
-          that.countyOp = response.data
-        }).catch(function (error) {
-          console.log(error)
-        })
+        }
       }
     }
   }

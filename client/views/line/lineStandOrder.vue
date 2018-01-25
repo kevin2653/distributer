@@ -565,7 +565,7 @@
       },
       /** 查看详情 */
       seeDetails (index, row) {
-        this.$router.push({name: '订单详情', params: {ordersn: row.ordersn, authorization: this.authorization}})
+        this.$router.push({path: '/line/lineStandOrder/lineStandDetails', query: {ordersn: row.ordersn}})
         console.log(row)
       },
       /** 取消订单 */
@@ -659,12 +659,12 @@
       },
       /** 标准线路订单录入 */
       orderAddMeth () {
-        this.$router.push({name: '标准线路订单录入', params: {authorization: this.authorization}})
+        this.$router.push({path: '/line/lineStandOrder/lineStandOrderAdd', query: {authorization: this.authorization}})
         console.log(this.authorization)
       },
       /** 查看团订单 */
       orderGroupMeth () {
-        this.$router.push({name: '团订单详情', params: {authorization: this.authorization}})
+        this.$router.push({path: '/line/lineStandOrder/orderGroupDetails', query: {authorization: this.authorization}})
       },
       /** 多选框触发 */
       handleSelectionChange (val) {

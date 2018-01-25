@@ -48,14 +48,14 @@
       }
     },
     created: function () {
-      this.dAccount = this.$route.params.distributerAccount
-      this.distributerId = this.$route.params.distributerId
+      this.dAccount = JSON.parse(this.$route.query.distributerAccount)
+      this.distributerId = this.$route.query.distributerId
       this.disNameDataGet()
     },
     methods: {
       /** 返回上一层 */
       returnToUpLevel () {
-        this.$router.push({name: '代理商账号管理', params: {distributerId: this.distributerId, dAccount: this.dAccount}})
+        this.$router.push({path: '/distributer/accountManagement', query: {distributerId: this.$route.query.distributerId, dAccount: this.$route.query.distributerAccount}})
       },
       // 获取cookie
       getCookie: function (cname) {

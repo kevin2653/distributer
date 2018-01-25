@@ -174,7 +174,7 @@
           <br>
           <div align="right">
             <el-form-item>
-              <el-button type="primary" @click="exitDistributer" v-if="this.$route.params.distributerId > 0">编辑</el-button>
+              <el-button type="primary" @click="exitDistributer" v-if="this.$route.query.distributerId > 0">编辑</el-button>
               <el-button type="primary" @click="onSubmit" v-else>保存</el-button>
             </el-form-item>
           </div>
@@ -299,7 +299,7 @@
       }
     },
     created: function () {
-      if (this.$route.params.distributerId > 0) {
+      if (this.$route.query.distributerId > 0) {
         this.showExit()
       } else {
         this.dataGet()
@@ -358,8 +358,8 @@
       showExit: function () {
 //        console.log(this.$route.params.distributerId)
         var that = this
-        if (that.$route.params.distributerId > 0) {
-          axios.get('/api/distributerInfo/findDistributerInfoById?distributerId=' + that.$route.params.distributerId, {
+        if (that.$route.query.distributerId > 0) {
+          axios.get('/api/distributerInfo/findDistributerInfoById?distributerId=' + that.$route.query.distributerId, {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
               'Authorization': 'Admin ' + that.getCookie('admin_token')
@@ -403,7 +403,7 @@
           }
         }
         var BODY = {
-          distributerId: that.$route.params.distributerId,
+          distributerId: that.$route.query.distributerId,
           bankAccountType: that.distributerInfoDTO.bankAccountType, /** 银行账户类型 */
           bankAccountName: that.distributerInfoDTO.bankAccountName, /** 收款开户名称 */
           bankProvinceId: that.distributerInfoDTO.bankProvinceId, /** 开户省id */
@@ -439,7 +439,7 @@
         }).then(response => {
           console.log(response)
           if (response.data === 'OK') {
-            this.$router.push({path: 'distributerList'})
+            that.$router.push({path: '/distributer/distributerList', query: {distributerId: that.$route.query.distributerId, distributerInfoDTO: that.$route.query.distributerInfoDTO}})
           }
           console.log('返回结束提交编辑表单')
         })
@@ -464,7 +464,7 @@
               that.provinceBOp.push(that.areaData[i])
             }
           }
-          if (that.$route.params.distributerId > 0) {
+          if (that.$route.query.distributerId > 0) {
             that.dataCiArea(that.distributerInfoDTO.provinceId, false)
             that.dataCoArea(that.distributerInfoDTO.cityId, false)
             that.dataBCiArea(that.distributerInfoDTO.bankProvinceId, false)
@@ -622,7 +622,7 @@
         }).then(function (response) {
           that.tableData = response.data.listDto
           that.managerData = ''
-          if (that.$route.params.distributerId > 0) {
+          if (that.$route.query.distributerId > 0) {
             for (var i = 0; i < that.tableData.length; i++) {
               if (that.tableData[i].distributerId === that.distributerInfoDTO.distributerPid) {
                 that.selectPDistributer = that.tableData[i].distributerName
@@ -642,7 +642,7 @@
           that.distributerInfoDTO.cityId = ''
           that.distributerInfoDTO.countyId = ''
         } else {
-          if (that.$route.params.distributerId > 0) {
+          if (that.$route.query.distributerId > 0) {
           } else {
             that.distributerInfoDTO.cityId = ''
             that.distributerInfoDTO.countyId = ''
@@ -661,7 +661,7 @@
         if (isChange === true) {
           that.distributerInfoDTO.countyId = ''
         } else {
-          if (that.$route.params.distributerId > 0) {
+          if (that.$route.query.distributerId > 0) {
           } else {
             that.distributerInfoDTO.countyId = ''
           }
@@ -681,7 +681,7 @@
           that.distributerInfoDTO.bankCityId = ''
           that.distributerInfoDTO.bankCountyId = ''
         } else {
-          if (that.$route.params.distributerId > 0) {
+          if (that.$route.query.distributerId > 0) {
           } else {
             that.distributerInfoDTO.bankCityId = ''
             that.distributerInfoDTO.bankCountyId = ''
@@ -700,7 +700,7 @@
         if (isChange === true) {
           that.distributerInfoDTO.bankCountyId = ''
         } else {
-          if (that.$route.params.distributerId > 0) {
+          if (that.$route.query.distributerId > 0) {
           } else {
             that.distributerInfoDTO.bankCountyId = ''
           }

@@ -202,8 +202,9 @@
       }
     },
     created: function () {
-      if (this.$route.params.distributerId > 0) {
-        this.distributerAccount = this.$route.params.dAccount
+      if (this.$route.query.distributerId > 0) {
+        this.distributerId = this.$route.query.distributerId
+        this.distributerAccount = JSON.parse(this.$route.query.dAccount)
         this.onSubmit()
         this.dataGet()
       } else {
@@ -411,7 +412,7 @@
             this.distributerId = this.multipleSelection[i].distributerId
           }
         }
-        this.$router.push({name: '新建代理商账号', params: {distributerId: this.distributerId, distributerAccount: this.distributerAccount}})
+        this.$router.push({path: '/distributer/accountManagement/addDisAccount', query: {distributerId: this.distributerId, distributerAccount: JSON.stringify(this.distributerAccount)}})
         console.log(this.distributerId)
       },
       /** 修改查询按钮状态 */
@@ -539,7 +540,7 @@
         }).then(function (response) {
           that.tableData = response.data.listDto
           that.managerData = ''
-          if (that.$route.params.distributerId > 0) {
+          if (that.$route.query.distributerId > 0) {
             for (var i = 0; i < that.tableData.length; i++) {
               if (that.distributerAccount.distributerId === that.tableData[i].distributerId) {
 //                console.log('ssssssssssssss')

@@ -153,8 +153,8 @@
       }
     },
     created: function () {
-      if (this.$route.params.Number > 0) {
-        this.systemAccountForm = this.$route.params.systemAccountForm
+      if (this.$route.query.Number > 0) {
+        this.systemAccountForm = JSON.parse(this.$route.query.systemAccountForm)
         this.onSubmit()
       }
     },
@@ -360,7 +360,7 @@
       },
       /** 添加账号 */
       addAccount () {
-        this.$router.push({name: '添加账号', params: {systemAccountForm: this.systemAccountForm}})
+        this.$router.push({path: '/system/sysAccountManage/addSystemAccount', query: {systemAccountForm: JSON.stringify(this.systemAccountForm)}})
       },
       /** 提交表单 */
       onSubmit () {

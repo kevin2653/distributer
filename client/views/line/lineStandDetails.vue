@@ -206,10 +206,10 @@
       }
     },
     created: function () {
-      this.ordersn = this.$route.params.ordersn
-      this.authorization = this.$route.params.authorization
-      console.log(this.ordersn)
-      console.log(this.authorization)
+      this.ordersn = this.$route.query.ordersn
+//      this.authorization = this.$route.params.authorization
+//      console.log(this.ordersn)
+//      console.log(this.authorization)
       this.orderDataGet()
 //      this.areaGet()
 //      this.dataGet()
@@ -256,7 +256,7 @@
           console.log(error)
         })
         /** 获取订单详情产品 */
-        axios.get('https://qa-api.yuelvhui.com/distrbuter/admin/order/detail/' + that.ordersn, {
+        axios.get(Vue.prototype.api + '/distrbuter/admin/order/detail/' + that.ordersn, {
           headers: {
             'Authorization': 'Sys ' + that.getCookie('authorization'),
             'Content-Type': 'application/json'

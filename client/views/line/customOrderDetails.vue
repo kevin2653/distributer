@@ -2,6 +2,9 @@
   <div style="background-color: #f2f2f2;" align="center">
     <div style="background-color: #ffffff;width:90%" align="left">
       <br>
+      <div style="margin-right: 5rem" align="right">
+        <a @click="returnToUpLevel">返回</a>
+      </div>
       <div style="width: 95%;margin-left: 3rem">
         <el-form label-width="200px">
           <div>
@@ -268,21 +271,17 @@
             value: '3',
             label: '商签'
           }]
-        }
+        },
+        /** 上级携带数据 */
+        lineOrder: {}
       }
     },
     created: function () {
-      this.orderDetails = this.$route.params.customDetails
+      this.lineOrder = JSON.parse(this.$route.query.lineOrder)
+      this.orderDetails = JSON.parse(this.$route.query.customDetails)
       this.orderDataGet(this.orderDetails)
     },
-    mounted: function () {
-//      if (typeof this.$route.params.orderDetails === 'undefined') {
-//        this.$router.push({name: '定制需求订单管理'})
-//      } else {
-//        this.orderDetails = this.$route.params.customDetails
-//        this.orderDataGet(this.orderDetails)
-//      }
-    },
+    mounted: function () {},
     updated: function () {
     },
     methods: {
@@ -297,9 +296,13 @@
         }
         return ''
       },
+      /** 返回上一层 */
+      returnToUpLevel () {
+        this.$router.push({path: '/line/lineCustomOrder', query: {lineOrder: JSON.stringify(this.lineOrder)}})
+      },
       /** 编辑定制需求 */
       editCustomOrder () {
-        this.$router.push({name: '编辑定制需求', params: {orderDetails: this.orderDetails}})
+        this.$router.push({path: '/line/lineCustomOrder/editCostomOrder', query: {orderDetails: JSON.stringify(this.orderDetails)}})
       },
       /** 定制需求订单支付 */
       customOrderPay () {

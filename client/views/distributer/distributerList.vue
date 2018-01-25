@@ -239,11 +239,11 @@
       }
     },
     created: function () {
-      if (this.$route.params.distributerId > 0) {
+      if (this.$route.query.distributerId > 0) {
         this.dataGet()
 //        this.dataProArea(37)
         this.areaGet()
-        this.distributerInfoDTO = this.$route.params.distributerInfoDTO
+        this.distributerInfoDTO = JSON.parse(this.$route.query.distributerInfoDTO)
         this.onSubmit()
       } else {
         this.dataGet()
@@ -288,13 +288,13 @@
       /** 查看代理商详情 */
       handleEdit (index, row) {
 //        this.$router.push('/distributer/代理商列表/代理商详情')
-        this.$router.push({name: '代理商详情', params: {distributerId: row.distributerId, distributerInfoDTO: this.distributerInfoDTO}})
+        this.$router.push({path: '/distributer/distributerList/distributerDetails', query: {distributerId: row.distributerId, distributerInfoDTO: JSON.stringify(this.distributerInfoDTO)}})
 //        console.log(row)
       },
       /** 查看下级代理 */
       handleDelete (index, row) {
         if (row.distributerId > 0) {
-          this.$router.push({name: '下级代理商', params: {distributerPid: row.distributerId, distributerInfoDTO: this.distributerInfoDTO}})
+          this.$router.push({path: '/distributer/distributerList/subDistributer', query: {distributerPid: row.distributerId, distributerInfoDTO: JSON.stringify(this.distributerInfoDTO)}})
         }
 //        console.log(row.distributerId)
       },
@@ -485,7 +485,7 @@
         }).then(function (response) {
           that.tableData = response.data.listDto
           that.managerData = ''
-          if (that.$route.params.distributerId > 0) {
+          if (that.$route.query.distributerId > 0) {
             for (var i = 0; i < that.tableData.length; i++) {
               if (that.distributerInfoDTO.distributerId === that.tableData[i].distributerId) {
 //                console.log('ssssssssssssss')
@@ -497,20 +497,6 @@
           console.log(error)
         })
       },
-      /** 获取省 */
-//      dataProArea: function (value) {
-//        var that = this
-//        axios.get(api + '/common/search/getInternalArea/' + value, {
-//          headers: {
-//            'Content-Type': 'application/x-www-form-urlencoded',
-//            'Authorization': 'Sys ' + that.getCookie('authorization')
-//          }
-//        }).then(function (response) {
-//          that.provinceOp = response.data
-//        }).catch(function (error) {
-//          console.log(error)
-//        })
-//      },
       /** 获取联系市 */
       dataCiArea: function (value) {
         var that = this

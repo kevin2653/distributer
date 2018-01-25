@@ -585,7 +585,7 @@
       },
       /** 查看详情 */
       seeDetails (index, row) {
-        this.$router.push({name: '签证订单详情', params: {ordersn: row.ordersn}})
+        this.$router.push({path: '/visa/visaOrderManage/visaOrderDetails', query: {ordersn: row.ordersn}})
         console.log(row)
       },
       /** 取消订单 */
@@ -679,7 +679,7 @@
       },
       /** 签证订单录入 */
       orderAddMeth () {
-        this.$router.push({name: '订单录入', params: {authorization: this.authorization}})
+        this.$router.push({path: '/visa/visaOrderManage/visaOrderAdd', query: {authorization: this.authorization}})
         console.log(this.authorization)
       },
       /** 查看团订单 */

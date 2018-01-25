@@ -71,14 +71,14 @@
       }
     },
     created: function () {
-      this.systemAccountForm = this.$route.params.systemAccountForm
+      this.systemAccountForm = JSON.parse(this.$route.query.systemAccountForm)
     },
     updated: function () {
     },
     methods: {
       /** 返回上一层 */
       returnToUpLevel () {
-        this.$router.push({name: '账号管理', params: {Number: 1, systemAccountForm: this.systemAccountForm}})
+        this.$router.push({path: '/system/sysAccountManage', query: {Number: 1, systemAccountForm: this.$route.query.systemAccountForm}})
       },
       // 获取cookie
       getCookie: function (cname) {

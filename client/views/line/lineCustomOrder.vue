@@ -317,6 +317,13 @@
     },
     created: function () {
       this.dataGet()
+      if (typeof this.$route.query.lineOrder !== 'undefined') {
+        this.lineOrder = JSON.parse(this.$route.query.lineOrder)
+        this.dataGet()
+        console.log('打印当前提交数据')
+        console.log(this.lineOrder)
+        this.onSubmit()
+      }
     },
     updated: function () {
     },
@@ -347,8 +354,7 @@
       },
       /** 查看详情 */
       seeDetails (index, row) {
-        this.$router.push({name: '定制需求详情', params: {customDetails: row}})
-        console.log(row)
+        this.$router.push({path: '/line/lineCustomOrder/customOrderDetails', query: {customDetails: JSON.stringify(row), lineOrder: JSON.stringify(this.lineOrder)}})
       },
       /** 关联线路 */
       linkLine (index, row) {
@@ -449,14 +455,15 @@
       /** 重置表单 */
       onReset () {
         this.lineOrder.distributerId = ''
-        this.lineOrder.tourGroup = ''
-        this.lineOrder.operationId = ''
+        this.lineOrder.teamId = ''
+        this.lineOrder.operatorId = ''
         this.lineOrder.isBeenManage = ''
-        this.lineOrder.addTime = ''
-        this.selectPDistributer = '选择代理商'
+        this.lineOrder.startTime = ''
+        this.lineOrder.endTime = ''
+        this.selectDistributer = '选择代理商'
         this.lineOrder.currentPage = 1
         this.lineOrder.pageSize = 5
-        this.distributerData = [{}]
+        this.distributerData = []
         this.orderData = []
         this.managerData = {}
         this.disName = ''
@@ -579,6 +586,10 @@
         }).then(function (response) {
           that.tableData = response.data.listDto
           that.managerData = ''
+          if (typeof that.$route.query.lineOrder !== 'undefined') {
+            that.rowClickDistributer(that.lineOrder)
+            that.BackFillPdistributer()
+          }
         }).catch(function (error) {
           console.log(error)
         })

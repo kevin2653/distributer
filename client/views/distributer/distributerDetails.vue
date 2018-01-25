@@ -121,7 +121,7 @@
       }
     },
     created: function () {
-      this.distributerInfoDTO = this.$route.params.distributerInfoDTO
+      this.distributerInfoDTO = JSON.parse(this.$route.query.distributerInfoDTO)
 //      console.log('DDDDDDDDDDDDD')
 //      console.log(this.distributerInfoDTO)
       this.dataPGet()
@@ -144,12 +144,12 @@
       },
       /** 返回上一层 */
       returnToUpLevel () {
-        this.$router.push({name: '代理商列表', params: {distributerId: this.distrubuterInfo.distributerId, distributerInfoDTO: this.distributerInfoDTO}})
+        this.$router.push({path: '/distributer/distributerList', query: {distributerId: this.distrubuterInfo.distributerId, distributerInfoDTO: JSON.stringify(this.distributerInfoDTO)}})
       },
       /** 编辑 */
       handleEdit () {
 //        this.$router.push('/distributer/代理商列表/代理商详情')
-        this.$router.push({name: '新建代理商', params: {distributerId: this.distrubuterInfo.distributerId}})
+        this.$router.push({path: '/distributer/addDistributer', query: {distributerId: this.distrubuterInfo.distributerId, distributerInfoDTO: JSON.stringify(this.distributerInfoDTO)}})
         console.log('编辑')
         console.log(this.distrubuterInfo.distributerId)
       },
@@ -205,10 +205,10 @@
       },
       /** 查询当前代理商信息 */
       dataGet: function () {
-        console.log(this.$route.params.distributerId)
+        console.log(this.$route.query.distributerId)
         var that = this
-        if (that.$route.params.distributerId > 0) {
-          axios.get('/api/distributerInfo/findDistributerInfoById?distributerId=' + that.$route.params.distributerId, {
+        if (that.$route.query.distributerId > 0) {
+          axios.get('/api/distributerInfo/findDistributerInfoById?distributerId=' + that.$route.query.distributerId, {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
               'Authorization': 'Admin ' + that.getCookie('admin_token')

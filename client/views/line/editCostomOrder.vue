@@ -2,6 +2,9 @@
   <div style="background-color: #f2f2f2" align="center">
     <div style="background-color: #ffffff;width:90%" align="left">
       <br>
+      <div style="margin-right: 5rem" align="right">
+        <a @click="returnToUpLevel">返回</a>
+      </div>
       <div style="width: 95%;margin-left: 10rem">
         <el-form label-width="200px" :model="orderDetails">
           <div>
@@ -267,17 +270,9 @@
       }
     },
     created: function () {
-      console.log('打印当前路由类型')
-      console.log(typeof this.$route.params.orderDetails)
-      this.orderDetails = this.$route.params.orderDetails
+      this.orderDetails = JSON.parse(this.$route.query.orderDetails)
     },
-    mounted: function () {
-//      if (typeof this.$route.params.orderDetails === 'undefined') {
-//        this.$router.push({path: 'line/lineCustomOrder'})
-//      } else {
-//        this.orderDetails = this.$route.params.orderDetails
-//      }
-    },
+    mounted: function () {},
     updated: function () {
     },
     methods: {
@@ -297,18 +292,22 @@
         var that = this
         var BODY = that.orderDetails
         /** 获取订单详情产品 */
-        axios.post(api + 'distrbuter/admin/customized/update', BODY, {
+        axios.post(Vue.prototype.api + 'distrbuter/admin/customized/update', BODY, {
           headers: {
             'Authorization': 'Sys ' + that.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
-          console.log('开始接收数据')
-          console.log(response.data)
-          console.log('接收数据结束')
+          if (response.data.code === 'SUCCESS') {
+            that.$router.push({path: '/line/lineCustomOrder/customOrderDetails', query: {customDetails: JSON.stringify(that.orderDetails)}})
+          }
         }).catch(function (error) {
           console.log(error)
         })
+      },
+      /** 返回上一层 */
+      returnToUpLevel () {
+        this.$router.push({path: '/line/lineCustomOrder/customOrderDetails', query: {customDetails: JSON.stringify(this.orderDetails)}})
       }
     }
   }

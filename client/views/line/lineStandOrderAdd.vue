@@ -148,17 +148,17 @@
             </el-form-item>
             <el-form-item label="收件地址:">
               <el-select v-model="type" @change="" placeholder="省" class="selWidth">
-                <el-option v-for="item in provinceOp" :key="item.areaId" :label="item.areaName" :value="item.areaId">
+                <el-option v-for="item in provinceOp" :key="item.id" :label="item.name" :value="item.id">
                 </el-option>
               </el-select>
               <label>-</label>
               <el-select v-model="type" @change="" placeholder="市" class="selWidth">
-                <el-option v-for="item in cityOp" :key="item.areaId" :label="item.areaName" :value="item.areaId">
+                <el-option v-for="item in cityOp" :key="item.id" :label="item.name" :value="item.id">
                 </el-option>
               </el-select>
               <label>-</label>
               <el-select v-model="type" placeholder="县" class="selWidth">
-                <el-option v-for="item in countyOp" :key="item.areaId" :label="item.areaName" :value="item.areaId">
+                <el-option v-for="item in countyOp" :key="item.id" :label="item.name" :value="item.id">
                 </el-option>
                 <label>    </label>
               </el-select>
@@ -358,18 +358,17 @@
         /** 产品模糊查询 */
         proName: '',
         /** 省 */
-        provinceOp: [{
-        }],
+        provinceOp: [],
         /** 市 */
-        cityOp: [{
-        }],
+        cityOp: [],
         /** 县 */
-        countyOp: [{
-        }]
+        countyOp: [],
+        areaData: [],
+        orderForm: {}
       }
     },
     created: function () {
-      this.dataProArea(37)
+      this.areaGet()
 //      this.authorization = this.$route.params.authorization
       this.proData()
 //      this.domesticList.push(this.traveler)
@@ -403,6 +402,51 @@
           })
           .catch(_ => {
           })
+      },
+      /** 查询省市县名称 */
+      areaGet: function () {
+//        console.log('开始查询名称')
+        var that = this
+        axios.get(api + 'common/search/getChinaAreas', {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Sys ' + that.getCookie('authorization')
+          }
+        }).then(function (response) {
+          that.areaData = response.data
+          for (var k = 0; k < that.areaData.length; k++) {
+            if (that.areaData[k].pid === 37) {
+              that.provinceOp.push(that.areaData[k])
+//              that.provinceBOp.push(that.areaData[k])
+            }
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
+      },
+      /** 获取联系市 */
+      dataCiArea: function (value) {
+        var that = this
+        that.cityOp = []
+        that.countyOp = []
+        that.orderForm.cityId = ''
+        that.orderForm.countyId = ''
+        for (var i = 0; i < that.areaData.length; i++) {
+          if (that.areaData[i].pid === value) {
+            that.cityOp.push(that.areaData[i])
+          }
+        }
+      },
+      /** 获取联系县 */
+      dataCoArea: function (value) {
+        var that = this
+        that.countyOp = []
+        that.orderForm.countyId = ''
+        for (var i = 0; i < that.areaData.length; i++) {
+          if (that.areaData[i].pid === value) {
+            that.countyOp.push(that.areaData[i])
+          }
+        }
       },
       /** input改变，查询产品 */
       inputChangePro () {
@@ -446,45 +490,6 @@
           }
         }).then(function (response) {
           that.lineData = response.data
-        }).catch(function (error) {
-          console.log(error)
-        })
-      },
-      /** 获取省 */
-      dataProArea: function (value) {
-        var that = this
-        axios.get('https://qa-api.yuelvhui.com/common/search/getInternalArea/' + value, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }).then(function (response) {
-          that.provinceOp = response.data
-        }).catch(function (error) {
-          console.log(error)
-        })
-      },
-      /** 获取市 */
-      dataCiArea: function (value) {
-        var that = this
-        axios.get('https://qa-api.yuelvhui.com/common/search/getInternalArea/' + value, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }).then(function (response) {
-          that.cityOp = response.data
-        }).catch(function (error) {
-          console.log(error)
-        })
-      },
-      /** 获取县 */
-      dataCoArea: function (value) {
-        var that = this
-        axios.get('https://qa-api.yuelvhui.com/common/search/getInternalArea/' + value, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }).then(function (response) {
-          that.countyOp = response.data
         }).catch(function (error) {
           console.log(error)
         })

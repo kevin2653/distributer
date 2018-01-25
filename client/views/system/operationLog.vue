@@ -69,7 +69,7 @@
     data () {
       return {
         totalPage: 0,
-        oprrationTableData: [{}],
+        oprrationTableData: [],
         operationLogForm: {
           currentPage: 1,
           pageSize: 5,
