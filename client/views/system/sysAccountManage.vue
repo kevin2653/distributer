@@ -83,7 +83,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=systemAccountForm.currentPage
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes=pageSizeArr
         :page-size=systemAccountForm.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalPage>
@@ -118,12 +118,15 @@
 </template>
 <script>
   import axios from 'axios'
+  import global from '../../global'
   export default {
     components: {
-      axios
+      axios,
+      global
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         /** 重置密码弹框 */
         restPasswordVisible: false,
         /** 删除代理商账号弹窗 */

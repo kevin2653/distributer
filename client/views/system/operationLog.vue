@@ -52,7 +52,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=operationLogForm.currentPage
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes=pageSizeArr
         :page-size=operationLogForm.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalPage>
@@ -62,12 +62,15 @@
 </template>
 <script>
   import axios from 'axios'
+  import global from '../../global'
   export default {
     components: {
-      axios
+      axios,
+      global
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         totalPage: 0,
         oprrationTableData: [],
         operationLogForm: {

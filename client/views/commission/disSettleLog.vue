@@ -142,7 +142,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=settleLogForm.currentPage
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes=pageSizeArr
         :page-size=settleLogForm.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalNum>
@@ -152,15 +152,15 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         /** 弹框管理 */
         dialogM: {
           dialogDistributer: false  /** 代理商弹框 */

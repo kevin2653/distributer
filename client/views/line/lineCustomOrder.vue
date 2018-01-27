@@ -154,7 +154,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=lineOrder.pageIndex
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes=pageSizeArr
         :page-size=lineOrder.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalNum>
@@ -246,6 +246,7 @@
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         /** button管理 */
         buttonM: {
           orderClaim: true /** 订单认领按钮 */
@@ -327,17 +328,6 @@
     updated: function () {
     },
     methods: {
-      // 获取cookie
-      getCookie: function (cname) {
-        var name = cname + '='
-        var ca = document.cookie.split(';')
-        for (var i = 0; i < ca.length; i++) {
-          var c = ca[i]
-          while (c.charAt(0) === ' ') c = c.substring(1)
-          if (c.indexOf(name) !== -1) return c.substring(name.length, c.length)
-        }
-        return ''
-      },
       /** 分页 */
       handleSizeChange (val) {
         this.lineOrder.pageSize = val
@@ -421,7 +411,7 @@
         }
         console.log('当前表单数据')
         console.log(BODY)
-        axios.post(global + 'distrbuter/admin/customized/list', BODY, {
+        axios.post(global.API + 'distrbuter/admin/customized/list', BODY, {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'

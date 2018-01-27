@@ -173,7 +173,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=lineOrder.pageIndex
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes= pageSizeArr
         :page-size=lineOrder.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalNum>
@@ -211,6 +211,7 @@
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         /** button管理 */
         buttonM: {
           orderClaim: true /** 订单认领按钮 */

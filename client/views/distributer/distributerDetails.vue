@@ -93,14 +93,11 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      Vue,
-      api
+      global
     },
     data () {
       return {
@@ -156,10 +153,10 @@
       /** 查询省市县名称 */
       areaGet: function () {
         var that = this
-        axios.get(Vue.prototype.api + 'common/search/getChinaAreas', {
+        axios.get(global.API + 'common/search/getChinaAreas', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': that.getCookie('authorization')
+            'Authorization': 'Sys ' + global.getCookie('authorization')
           }
         }).then(function (response) {
           that.areaData = response.data
@@ -194,7 +191,7 @@
         axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: ''}, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.tableData = response.data.listDto
@@ -211,7 +208,7 @@
           axios.get('/api/distributerInfo/findDistributerInfoById?distributerId=' + that.$route.query.distributerId, {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
-              'Authorization': 'Admin ' + that.getCookie('admin_token')
+              'Authorization': 'Admin ' + global.getCookie('admin_token')
             }
           }).then(function (response) {
             that.distrubuterInfo = response.data

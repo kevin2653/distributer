@@ -194,7 +194,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=settleForm.currentPage
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes=pageSizeArr
         :page-size=settleForm.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalNum>
@@ -244,15 +244,15 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         show: false,
         /** 弹框管理 */
         dialogM: {
@@ -645,10 +645,10 @@
       areaGet: function () {
         console.log('开始查询名称')
         var that = this
-        axios.get(api + 'common/search/getChinaAreas', {
+        axios.get(global.API + 'common/search/getChinaAreas', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': that.getCookie('authorization')
+            'Authorization': global.getCookie('authorization')
           }
         }).then(function (response) {
           that.areaData = response.data

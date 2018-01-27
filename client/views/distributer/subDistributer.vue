@@ -153,7 +153,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=distributerInfoDTO.currentPage
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes=pageSizeArr
         :page-size=distributerInfoDTO.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalPage>
@@ -165,15 +165,15 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         dialogVisible: false,
         totalPage: 0,
         gradeOp: [],
@@ -288,7 +288,7 @@
       areaGet: function () {
         console.log('开始查询名称')
         var that = this
-        axios.get(Vue.prototype.api + 'common/search/getChinaAreas', {
+        axios.get(global.API + 'common/search/getChinaAreas', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': 'Sys ' + that.getCookie('authorization')

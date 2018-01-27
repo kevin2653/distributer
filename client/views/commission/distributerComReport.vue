@@ -143,15 +143,15 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         /** 弹框管理 */
         dialogM: {
           dialogDistributer: false  /** 代理商弹框 */

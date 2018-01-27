@@ -172,7 +172,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=distributerInfoDTO.currentPage
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes=pageSizeArr
         :page-size=distributerInfoDTO.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalPage>
@@ -185,15 +185,15 @@
 
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         /** 数据总条数 */
         totalPage: 0,
         /** 代理商弹框 */
@@ -318,7 +318,7 @@
         axios.post('/api/distributerInfo/queryAllDistributerByJoin', {distributerName: that.name}, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.tableData = response.data.listDto
@@ -340,10 +340,10 @@
       areaGet: function () {
 //        console.log('开始查询名称')
         var that = this
-        axios.get(api + 'common/search/getChinaAreas', {
+        axios.get(global.API + 'common/search/getChinaAreas', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Sys ' + that.getCookie('authorization')
+            'Authorization': 'Sys ' + global.getCookie('authorization')
           }
         }).then(function (response) {
           that.areaData = response.data
@@ -394,7 +394,7 @@
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Admin ' + that.getCookie('admin_token')
+              'Authorization': 'Admin ' + global.getCookie('admin_token')
             }
           }).then(response => {
             that.ContableData = response.data.listDto
@@ -424,7 +424,7 @@
         axios.get('/api/distributerInfo/findDistributerInfoById?distributerId=' + row.distributerId, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           if (response.data.distributerId === null) {
@@ -447,7 +447,7 @@
         axios.get('/api/distributerGrade/queryAllDistributerGrade', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.gradeOp = response.data
@@ -458,7 +458,7 @@
         axios.get('/api/distributerChannel/queryAllDistributerChannel', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.channelOp = response.data
@@ -469,7 +469,7 @@
         axios.get('/api/systemManager/queryAllSystemManagerByJoin', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.managerOp = response.data.systemManagerDTOList
@@ -480,7 +480,7 @@
         axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: ''}, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.tableData = response.data.listDto

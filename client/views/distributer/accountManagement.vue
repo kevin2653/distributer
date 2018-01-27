@@ -113,7 +113,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=distributerAccount.currentPage
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes=pageSizeArr
         :page-size=distributerAccount.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalPage>
@@ -148,15 +148,15 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         /** 重置密码弹框 */
         restPasswordVisible: false,
         /** 删除代理商账号弹窗 */
@@ -359,7 +359,7 @@
         axios.post('/api/distributerAccount/resetPassword', {accountId: row.accountId}, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           console.log('重置密码开始')
@@ -380,7 +380,7 @@
         axios.post('/api/distributerAccount/updateStatus', BODY, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + this.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           console.log('修改状态开始')
@@ -430,7 +430,7 @@
         axios.post('/api/distributerAccount/queryDistributerAccount', BODY, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.ContableData = response.data.distributerAccountDTOList
@@ -484,7 +484,7 @@
         axios.post('/api/distributerInfo/queryAllDistributerByJoin', {distributerName: that.name}, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.tableData = response.data.listDto
@@ -510,7 +510,7 @@
         axios.get('/api/distributerInfo/findDistributerInfoById?distributerId=' + row.distributerId, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           console.log('显示详情')
@@ -535,7 +535,7 @@
         axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: ''}, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': ('Admin ' + that.getCookie('admin_token')).toString()
+            'Authorization': ('Admin ' + global.getCookie('admin_token')).toString()
           }
         }).then(function (response) {
           that.tableData = response.data.listDto

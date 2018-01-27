@@ -119,16 +119,13 @@
 
 <script>
   import Chartist from 'vue-bulma-chartist'
-  import Vue from 'vue'
+  import global from '../global'
   import axios from 'axios'
-  var api = 'https://qa-api.yuelvhui.com/'
-//  import Vue from 'vue'
-//  Vue.prototype.$http = axios
   export default {
     components: {
       Chartist,
       axios,
-      api
+      global
     },
     data () {
       console.log('function data () start Run!')
@@ -207,7 +204,7 @@
       },
       getData () {
         var that = this
-        axios.get(Vue.prototype.api + 'distrbuter/admin/order/preview/' + that.year, {
+        axios.get(global.API + 'distrbuter/admin/order/preview/' + that.year, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': 'Sys ' + that.getCookie('authorization')
