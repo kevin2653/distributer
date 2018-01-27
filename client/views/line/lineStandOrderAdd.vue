@@ -2,6 +2,9 @@
   <div style="background-color: #f2f2f2" align="center">
     <div style="background-color: #ffffff;width:90%" align="left">
       <br>
+      <div style="margin-right: 5rem" align="right">
+        <a @click="returnToUpLevel">返回</a>
+      </div>
       <div style="width: 95%;margin-left: 3rem">
         <el-form label-width="200px">
           <div>
@@ -479,6 +482,10 @@
           }
         }
 //        that.lineOrder.pid = row.pid
+      },
+      /** 返回上一层 */
+      returnToUpLevel () {
+        this.$router.push({path: '/line/lineStandOrder', query: {lineOrder: this.$route.query.lineOrder}})
       },
       /** 获取线路产品 */
       proData () {

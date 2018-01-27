@@ -90,7 +90,7 @@
           <div align="center" style="margin-right: 30rem">
             <el-form-item>
             <el-button type="primary" @click="editCustomOrder">编  辑</el-button>
-              <el-button type="primary" @click="dialogM.settingPrice = true">价格设置</el-button>
+              <!--<el-button type="primary" @click="dialogM.settingPrice = true"></el-button>-->
               <el-button type="primary" @click="customOrderPay">支  付</el-button>
             </el-form-item>
           </div>
@@ -102,49 +102,25 @@
     <div>
       <el-dialog title="订单支付" :visible.sync="dialogM.orderPayDialog" width="30%" :modal-append-to-body="false" center>
         <div style="margin-left: 5rem">
-          <el-form class="demo-form-inline">
-            <label>团号:</label><br>
-            <label>单价(成人):</label><br>
-            <label>成人:</label><br>
-            <label>单价(儿童):</label><br>
-            <label>儿童:</label><br>
-            <label>支付总金额:</label><br>
+          <el-form class="demo-form-inline" :model="customOrderPayForm" :rules="rules" ref="customOrderPayForm">
+            <label>团号: {{customOrderPayForm.team_id}}</label><br>
+            <label>订单编号: {{customOrderPayForm.requirementId}}</label><br>
+            <label>联系人: {{customOrderPayForm.linkMan}}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label>电话: {{customOrderPayForm.linkTel}}</label><br>
+            <label>成人: {{customOrderPayForm.adultStr}}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label>儿童: {{customOrderPayForm.childStr}}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label>老人: {{customOrderPayForm.oldStr}}</label><br>
+            <el-form-item label="总支付金额" prop="amountStr">
+              <el-input style="width: 10rem" v-model.number="customOrderPayForm.amountStr"></el-input><label>元</label>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" disabled v-if="customOrderPayForm.amountStr === ''" style="margin-left: 8rem">生成支付二维码</el-button>
+              <el-button type="primary" @click="getPayORcode" v-else style="margin-left: 8rem">生成支付二维码</el-button>
+            </el-form-item>
           </el-form>
         </div>
-        <span slot="footer" class="dialog-footer">
+        <span slot="footer" class="dialog-footer" style="display: none">
             <el-button type="primary" @click="dialogM.orderPayDialog = false">关 闭</el-button>
-          </span>
-      </el-dialog>
-    </div>
-    <!--价格设置弹窗-->
-    <div>
-      <el-dialog title="价格设置" :visible.sync="dialogM.settingPrice" width="30%" :modal-append-to-body="false" center>
-        <div style="margin-left: 8rem">
-          <el-form status-icon label-width="100px" class="demo-ruleForm">
-            <el-form-item label="订单编号：">
-            </el-form-item>
-            <el-form-item label="目的地">
-            </el-form-item>
-            <el-form-item label="单价(成人)">
-              <el-input style="width: 10rem"></el-input>
-            </el-form-item>
-            <el-form-item label="出行人数">
-              <el-input style="width: 10rem"></el-input>
-            </el-form-item>
-            <el-form-item label="单价(儿童)">
-              <el-input style="width: 10rem"></el-input>
-            </el-form-item>
-            <el-form-item label="出行人数">
-              <el-input style="width: 10rem"></el-input>
-            </el-form-item>
-            <el-form-item label="支付总金额">
-              <el-input style="width: 10rem"></el-input>
-            </el-form-item>
-          </el-form>
-        </div>
-        <span slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="dialogM.settingPrice = false">确  定</el-button>
-            <el-button type="primary" @click="dialogM.settingPrice = false">关  闭</el-button>
           </span>
       </el-dialog>
     </div>
@@ -152,19 +128,17 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
         /** 弹框管理 */
         dialogM: {
           orderPayDialog: false,   /** 订单支付弹窗 */
-          settingPrice: false,   /** 价格设置弹窗 */
           paySuccess: false    /** 支付成功弹窗 */
         },
         /** 出行人数 */
@@ -172,7 +146,9 @@
         /** 当前订单详情 */
         orderDetails: {},
         /** 定制需求支付表单 */
-        customOrderPayForm: {},
+        customOrderPayForm: {
+          amountStr: ''
+        },
         /** 下拉框管理 */
         selectM: {
           /** 机型 */
@@ -273,7 +249,13 @@
           }]
         },
         /** 上级携带数据 */
-        lineOrder: {}
+        lineOrder: {},
+        rules: {
+          amountStr: [
+//            { required: true, message: '请输入开户银行卡号', trigger: 'blur' },
+            { type: 'number', message: '请输入数字' }
+          ]
+        }
       }
     },
     created: function () {
@@ -282,19 +264,26 @@
       this.orderDataGet(this.orderDetails)
     },
     mounted: function () {},
-    updated: function () {
-    },
+    updated: function () {},
     methods: {
-      // 获取cookie
-      getCookie: function (cname) {
-        var name = cname + '='
-        var ca = document.cookie.split(';')
-        for (var i = 0; i < ca.length; i++) {
-          var c = ca[i]
-          while (c.charAt(0) === ' ') c = c.substring(1)
-          if (c.indexOf(name) !== -1) return c.substring(name.length, c.length)
+      // 点击生成支付二维码
+      getPayORcode () {
+        var that = this
+        var BODY = {
+          requirementId: that.customOrderPayForm.requirementId,
+          amount: Number(that.customOrderPayForm.amountStr) * 100
         }
-        return ''
+        axios.post(global.API + 'distrbuter/admin/customized/addOrder', BODY, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Sys ' + global.getCookie('authorization')
+          }
+        }).then(function (response) {
+          console.log('打印二维码返回的数据')
+          console.log(response.data)
+        }).catch(function (error) {
+          console.log(error)
+        })
       },
       /** 返回上一层 */
       returnToUpLevel () {
@@ -307,6 +296,22 @@
       /** 定制需求订单支付 */
       customOrderPay () {
         this.dialogM.orderPayDialog = true
+        this.customOrderPayForm.requirementId = this.orderDetails.requirementId // 订单号
+        this.customOrderPayForm.team_id = this.orderDetails.team_id // 团号
+        this.customOrderPayForm.linkMan = this.orderDetails.linkMan // 联系人
+        this.customOrderPayForm.linkTel = this.orderDetails.linkTel // 联系电话
+        this.customOrderPayForm.childStr = '无'
+        if (global.isNull(this.orderDetails.tourers.subNum.child)) {
+          this.customOrderPayForm.childStr = this.orderDetails.tourers.subNum.child + '人'
+        }
+        this.customOrderPayForm.adultStr = '无'
+        if (global.isNull(this.orderDetails.tourers.subNum.adult)) {
+          this.customOrderPayForm.adultStr = this.orderDetails.tourers.subNum.adult + '人'
+        }
+        this.customOrderPayForm.oldStr = '无'
+        if (global.isNull(this.orderDetails.tourers.subNum.old)) {
+          this.customOrderPayForm.oldStr = this.orderDetails.tourers.subNum.old + '人'
+        }
       },
       /** 进入界面即加载 */
       orderDataGet (orderDetails) {

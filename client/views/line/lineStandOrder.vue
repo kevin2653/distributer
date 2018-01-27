@@ -234,8 +234,10 @@
             <el-table-column align="center" width="340" label="操作">
               <template slot-scope="scope" center>
                 <el-button round size="mini" @click="seeDetails(scope.$index, scope.row)">查看详情</el-button>
-                <el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" disable v-if="scope.row.statusId !== 115&& scope.row.statusId !== 200">取消订单</el-button>
-                <el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" disable v-if="scope.row.statusId === 201">已取消</el-button>
+                <el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" v-if="scope.row.statusId === 101&& scope.row.statusId === 102&& scope.row.statusId === 111">取消订单</el-button>
+                <!--<el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" v-else>取消订单</el-button>-->
+                <el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" disabled v-if="scope.row.statusId === 201">已取消</el-button>
+                <!--<el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" v-else>已取消</el-button>-->
                 <el-button round size="mini" @click="payOrder(scope.$index, scope.row)" v-if="scope.row.statusId === 101">支付订单</el-button>
               </template>
             </el-table-column>
@@ -249,7 +251,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page=lineOrder.pageIndex
-        :page-sizes="[3, 5, 7, 9]"
+        :page-sizes=pageSizeArr
         :page-size=lineOrder.pageSize
         layout="total, sizes, prev, pager, next, jumper"
         :total=totalNum>
@@ -336,14 +338,17 @@
 
 <script>
   import axios from 'axios'
+  import global from '../../global'
   import Vue from 'vue'
   var api = Vue.prototype.api
   export default {
     components: {
-      axios
+      axios,
+      global
     },
     data () {
       return {
+        pageSizeArr: global.pageSizeArr,
         /** button管理 */
         buttonM: {
           orderAdd: true,   /** 订单录入按钮 */
@@ -598,7 +603,7 @@
           ordersn: that.ordersn,
           reason: that.canRadio
         }
-        axios.post('https://qa-api.yuelvhui.com/distrbuter/admin/order/cancel', BODY, {
+        axios.post(Vue.prototype.api + 'distrbuter/admin/order/cancel', BODY, {
           headers: {
             'Authorization': 'Sys ' + that.getCookie('authorization'),
             'Content-Type': 'application/json'
@@ -643,7 +648,7 @@
             for (var i = 0; i < that.orderData.length; i++) {
               console.log('开始订单匹配')
               if (that.orderData[i].ordersn === that.orderClaimForm.ordersn) {
-                console.log('开始订单匹配')
+                console.log('开始订单匹配2')
                 for (var j = 0; j < that.managerOp.length; j++) {
                   if (that.orderClaimForm.operationId === that.managerOp[j].managerId) {
                     console.log('命名成功')
@@ -657,6 +662,7 @@
               }
             }
           }
+          console.log(that.orderData)
         }).catch(function (error) {
           console.log(error)
         })
@@ -664,12 +670,11 @@
       },
       /** 标准线路订单录入 */
       orderAddMeth () {
-        this.$router.push({path: '/line/lineStandOrder/lineStandOrderAdd', query: {authorization: this.authorization}})
-        console.log(this.authorization)
+        this.$router.push({path: '/line/lineStandOrder/lineStandOrderAdd', query: {lineOrder: JSON.stringify(this.lineOrder)}})
       },
       /** 查看团订单 */
       orderGroupMeth () {
-        this.$router.push({path: '/line/lineStandOrder/orderGroupDetails', query: {authorization: this.authorization}})
+        this.$router.push({path: '/line/lineStandOrder/orderGroupDetails', query: {lineOrder: JSON.stringify(this.lineOrder)}})
       },
       /** 多选框触发 */
       handleSelectionChange (val) {
@@ -714,8 +719,6 @@
           pageIndex: that.lineOrder.pageIndex,
           pageSize: that.lineOrder.pageSize
         }
-        console.log('当前表单数据')
-        console.log(BODY)
         axios.post(api + 'distrbuter/admin/order/list', BODY, {
           headers: {
             'Authorization': 'Sys ' + that.getCookie('authorization'),
@@ -755,7 +758,7 @@
         this.lineOrder.pid = ''
         this.lineOrder.isBeenManage = ''
         this.lineOrder.addTime = ''
-        this.selectPDistributer = '选择代理商'
+        this.selectDistributer = '选择代理商'
         this.selectProduct = '选择产品'
         this.lineOrder.currentPage = 1
         this.lineOrder.pageSize = 5
@@ -852,6 +855,10 @@
           }
         }).then(function (response) {
           that.lineData = response.data
+          if (typeof that.$route.query.lineOrder !== 'undefined') {
+            that.rowClickProduct(that.lineOrder)
+            that.BackFillProduct()
+          }
         }).catch(function (error) {
           console.log(error)
         })
@@ -882,6 +889,10 @@
         }).then(function (response) {
           that.tableData = response.data.listDto
           that.managerData = ''
+          if (typeof that.$route.query.lineOrder !== 'undefined') {
+            that.rowClickDistributer(that.lineOrder)
+            that.BackFillPdistributer()
+          }
         }).catch(function (error) {
           console.log(error)
         })

@@ -1,5 +1,9 @@
 <template>
   <div style="min-height: 650px">
+    <br>
+    <div style="margin-right: 5rem" align="right">
+      <a @click="returnToUpLevel">返回</a>
+    </div>
     <el-form class="demo-form-inline">
       <el-row :gutter="20">
         <el-col :span="12">
@@ -49,7 +53,7 @@
                 <th class="th">团号</th>
                 <td colspan="2" class="th">{{groupDetails.tourGroup}}</td>
                 <th class="th" colspan="2">出行日期</th>
-                <td colspan="5" class="th">2017-12-27</td>
+                <td colspan="5" class="th">{{groupDetails.travelDate}}</td>
               </tr>
               <tr>
                 <th class="th">出行人数</th>
@@ -226,13 +230,14 @@
       /** 获取线路产品 */
       proData () {
         var that = this
-        axios.get(api + "distrbuter/product/list/1/''", {
+        axios.get(Vue.prototype.api + "distrbuter/product/list/1/''", {
           headers: {
             'Authorization': 'Sys ' + that.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
           that.lineData = response.data
+          console.log(that.lineData)
         }).catch(function (error) {
           console.log(error)
         })
@@ -240,16 +245,27 @@
       /** 查询团订单 */
       onSubmit () {
         var that = this
-        axios.get(Vue.prototype.api + '/distrbuter/admin/order/tour/list/' + that.tourGroup, {
+        axios.get(Vue.prototype.api + 'distrbuter/admin/order/tour/list/' + that.tourGroup, {
           headers: {
             'Authorization': 'Sys ' + that.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
           console.log('开始接收数据')
+          console.log(response.data)
           that.groupDetails = response.data
           // 出行人数
-          that.groupDetails.tourersNum = that.groupDetails.adultNum + '成人' + that.groupDetails.childNum + '儿童' + that.groupDetails.oldNum + '老人'
+          that.groupDetails.tourersNum = ''
+          if (that.groupDetails.adultNum !== 0) {
+            that.groupDetails.tourersNum = that.groupDetails.tourersNum + that.groupDetails.adultNum + '成人'
+          }
+          if (that.groupDetails.childNum !== 0) {
+            that.groupDetails.tourersNum = that.groupDetails.tourersNum + that.groupDetails.childNum + '儿童'
+          }
+          if (that.groupDetails.oldNum !== 0) {
+            that.groupDetails.tourersNum = that.groupDetails.tourersNum + that.groupDetails.oldNum + '老人'
+          }
+//          that.groupDetails.tourersNum = that.groupDetails.adultNum + '成人' + that.groupDetails.childNum + '儿童' + that.groupDetails.oldNum + '老人'
           // 总支付金额
           that.groupDetails.amountStr = (that.groupDetails.amount / 100) + '.00'
           for (var w = 0; w < that.groupDetails.tourers.length; w++) {
@@ -285,6 +301,7 @@
               that.groupDetails.pName = that.lineData[r].pName
             }
           }
+//          that.groupDetails.pName = that.lineData[0].pName
           console.log(that.groupDetails)
           console.log('接收数据结束')
         }).catch(function (error) {
@@ -317,6 +334,10 @@
         }).catch(function (error) {
           console.log(error)
         })
+      },
+      /** 返回上一层 */
+      returnToUpLevel () {
+        this.$router.push({path: '/line/lineStandOrder', query: {lineOrder: this.$route.query.lineOrder}})
       }
     }
   }
