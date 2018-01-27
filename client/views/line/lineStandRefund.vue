@@ -203,12 +203,11 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
@@ -288,17 +287,6 @@
     updated: function () {
     },
     methods: {
-      // 获取cookie
-      getCookie: function (cname) {
-        var name = cname + '='
-        var ca = document.cookie.split(';')
-        for (var i = 0; i < ca.length; i++) {
-          var c = ca[i]
-          while (c.charAt(0) === ' ') c = c.substring(1)
-          if (c.indexOf(name) !== -1) return c.substring(name.length, c.length)
-        }
-        return ''
-      },
       /** 分页 */
       handleSizeChange (val) {
         this.lineOrder.pageSize = val
@@ -344,9 +332,9 @@
         }
         console.log('当前表单数据')
         console.log(BODY)
-        axios.post(api + 'distrbuter/admin/order/list', BODY, {
+        axios.post(global.API + 'distrbuter/admin/order/list', BODY, {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -481,11 +469,11 @@
           })
       },
       /** 获取线路产品 */
-      proData (authorization) {
+      proData () {
         var that = this
-        axios.get(api + "distrbuter/product/list/100/''", {
+        axios.get(global.API + "distrbuter/product/list/100/''", {
           headers: {
-            'Authorization': authorization,
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -500,12 +488,12 @@
         axios.get('/api/systemManager/queryAllSystemManagerByJoin', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.managerOp = response.data.systemManagerDTOList
           that.authorization = response.data.authorization
-          that.proData(that.authorization)
+          that.proData()
 //          console.log(that.managerOp)
         }).catch(function (error) {
           console.log(error)
@@ -514,7 +502,7 @@
         axios.post('/api/distributerInfo/queryAllDistributerByJoin', {deapth: ''}, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.tableData = response.data.listDto

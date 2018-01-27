@@ -153,12 +153,11 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
@@ -276,25 +275,14 @@
     updated: function () {
     },
     methods: {
-      // 获取cookie
-      getCookie: function (cname) {
-        var name = cname + '='
-        var ca = document.cookie.split(';')
-        for (var i = 0; i < ca.length; i++) {
-          var c = ca[i]
-          while (c.charAt(0) === ' ') c = c.substring(1)
-          if (c.indexOf(name) !== -1) return c.substring(name.length, c.length)
-        }
-        return ''
-      },
       // 编辑定制订单
       editOrder () {
         var that = this
         var BODY = that.orderDetails
         /** 获取订单详情产品 */
-        axios.post(Vue.prototype.api + 'distrbuter/admin/customized/update', BODY, {
+        axios.post(global.API + 'distrbuter/admin/customized/update', BODY, {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {

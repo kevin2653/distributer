@@ -96,14 +96,13 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   import html2canvas from 'html2canvas'
   import JSPDF from 'jspdf'
   export default {
     components: {
       axios,
-      api,
+      global,
       html2canvas,
       JSPDF
     },
@@ -230,9 +229,9 @@
       /** 获取线路产品 */
       proData () {
         var that = this
-        axios.get(Vue.prototype.api + "distrbuter/product/list/1/''", {
+        axios.get(global.API + "distrbuter/product/list/1/''", {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -245,9 +244,9 @@
       /** 查询团订单 */
       onSubmit () {
         var that = this
-        axios.get(Vue.prototype.api + 'distrbuter/admin/order/tour/list/' + that.tourGroup, {
+        axios.get(global.API + 'distrbuter/admin/order/tour/list/' + that.tourGroup, {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -314,7 +313,7 @@
         axios.get('/api/systemManager/queryAllSystemManagerByJoin', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.arrManage.managerOp = response.data.systemManagerDTOList
@@ -327,7 +326,7 @@
         axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: ''}, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.arrManage.tableData = response.data.listDto

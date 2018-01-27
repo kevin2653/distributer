@@ -339,8 +339,6 @@
 <script>
   import axios from 'axios'
   import global from '../../global'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
   export default {
     components: {
       axios,
@@ -468,17 +466,6 @@
     updated: function () {
     },
     methods: {
-      // 获取cookie
-      getCookie: function (cname) {
-        var name = cname + '='
-        var ca = document.cookie.split(';')
-        for (var i = 0; i < ca.length; i++) {
-          var c = ca[i]
-          while (c.charAt(0) === ' ') c = c.substring(1)
-          if (c.indexOf(name) !== -1) return c.substring(name.length, c.length)
-        }
-        return ''
-      },
       /** 分页 */
       handleSizeChange (val) {
         this.lineOrder.pageSize = val
@@ -524,9 +511,9 @@
           ordersns: ordersn,
           statusId: that.statusId
         }
-        axios.post(api + 'distrbuter/admin/order/updateStatus', BODY, {
+        axios.post(global.API + 'distrbuter/admin/order/updateStatus', BODY, {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -603,9 +590,9 @@
           ordersn: that.ordersn,
           reason: that.canRadio
         }
-        axios.post(Vue.prototype.api + 'distrbuter/admin/order/cancel', BODY, {
+        axios.post(global.API + 'distrbuter/admin/order/cancel', BODY, {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -635,9 +622,9 @@
           ordersn: that.orderClaimForm.ordersn,
           operatorId: that.orderClaimForm.operationId
         }
-        axios.post(api + 'distrbuter/admin/order/setOperationManager', BODY, {
+        axios.post(global.API + 'distrbuter/admin/order/setOperationManager', BODY, {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -719,9 +706,9 @@
           pageIndex: that.lineOrder.pageIndex,
           pageSize: that.lineOrder.pageSize
         }
-        axios.post(api + 'distrbuter/admin/order/list', BODY, {
+        axios.post(global.API + 'distrbuter/admin/order/list', BODY, {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -848,9 +835,9 @@
       /** 获取线路产品 */
       proData () {
         var that = this
-        axios.get(api + "distrbuter/product/list/1/''", {
+        axios.get(global.API + "distrbuter/product/list/1/''", {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
@@ -870,7 +857,7 @@
         axios.get('/api/systemManager/queryAllSystemManagerByJoin', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.managerOp = response.data.systemManagerDTOList
@@ -884,7 +871,7 @@
         axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: ''}, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Admin ' + that.getCookie('admin_token')
+            'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {
           that.tableData = response.data.listDto
