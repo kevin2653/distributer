@@ -320,6 +320,17 @@
     value: 2,
     label: '企业'
   }]
+  // 护照
+  const passportOp = [{
+    value: 0,
+    label: '普通因私护照'
+  }, {
+    value: 1,
+    label: '公务护照'
+  }, {
+    value: 2,
+    label: '外交护照'
+  }]
   // 获取cookie方法
   function getCookie (cname) {
     var name = cname + '='
@@ -371,6 +382,7 @@
     getCookie,  // 获取cookie
     API,
     pageSizeArr, // 全局分页数组
-    isNull  // 是否为空
+    isNull,  // 是否为空
+    passportOp // 护照
   }
 </script>

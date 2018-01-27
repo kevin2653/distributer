@@ -6,26 +6,26 @@
         <a @click="returnToUpLevel">返回</a>
       </div>
       <div style="width: 95%;margin-left: 3rem">
-        <el-form label-width="200px">
+        <el-form label-width="200px" :model="orderForm" :rules="rules" ref="orderForm">
           <div>
             <label>联系人信息</label>
           </div>
           <br>
           <div>
-            <el-form-item label="联系人姓名">
-              <el-input style="width: 23.2rem"></el-input>
+            <el-form-item label="联系人姓名" prop="linkMan">
+              <el-input style="width: 23.2rem" v-model="orderForm.linkMan"></el-input>
             </el-form-item>
-            <el-form-item label="联系电话">
-              <el-input style="width: 23.2rem"></el-input>
+            <el-form-item label="联系电话" prop="linkTel">
+              <el-input style="width: 23.2rem" v-model="orderForm.linkTel"></el-input>
             </el-form-item>
             <el-form-item label="联系地址">
-              <el-input style="width: 23.2rem"></el-input>
+              <el-input style="width: 23.2rem" v-model="orderForm.linkAdress"></el-input>
             </el-form-item>
             <el-form-item label="邮箱地址">
-              <el-input style="width: 23.2rem"></el-input>
+              <el-input style="width: 23.2rem" v-model="orderForm.linkEmail"></el-input>
             </el-form-item>
             <el-form-item label="微信号">
-              <el-input style="width: 23.2rem"></el-input>
+              <el-input style="width: 23.2rem" v-model="orderForm.linkWeixin"></el-input>
             </el-form-item>
           </div>
           <br>
@@ -33,7 +33,7 @@
             <label>线路产品订单信息</label>
           </div>
           <div>
-            <el-form-item label="线路产品">
+            <el-form-item label="线路产品" prop="pid">
               <el-button style="width: 23.2rem" @click="dialogM.dialogProduct = true">{{selectProduct}}</el-button>
               <el-dialog title="选择线路产品" :visible.sync="dialogM.dialogProduct" :modal-append-to-body="false"
                          :before-close="handleClose" center class="modelStyle" width="70%">
@@ -111,61 +111,61 @@
                       </span>
               </el-dialog>
             </el-form-item>
-            <el-form-item label="团号">
+            <el-form-item label="团号" prop="tourGroup">
               <!--{{orderDetails.ordersn}}-->
             </el-form-item>
-            <el-form-item label="出行人数">
-              <label>成人  </label><el-input style="width: 9.2rem"></el-input>
-              <label>儿童  </label><el-input style="width: 9.2rem"></el-input>
+            <el-form-item label="出行人数" prop="tourersNum">
+              <label>成人  </label><el-input style="width: 9.2rem" v-model="orderForm.tourers.subNum.adult"></el-input>
+              <label>儿童  </label><el-input style="width: 9.2rem" v-model="orderForm.tourers.subNum.child"></el-input>
             </el-form-item>
-            <el-form-item label="出行时间">
+            <el-form-item label="出行时间" prop="travelDate">
               <!--{{orderDetails.tourGroup}}-->
             </el-form-item>
-            <el-form-item label="套餐">
+            <el-form-item label="套餐" prop="suitId">
               <!--{{travelerNum}}-->
             </el-form-item>
-            <el-form-item label="出发地">
+            <el-form-item label="出发地" prop="fromCity">
               <!--{{orderDetails.travelDate}}-->
             </el-form-item>
-            <el-form-item label="支付方式">
+            <el-form-item label="支付方式" prop="payType">
               <!--{{orderDetails.travelDate}}-->
             </el-form-item>
-            <el-form-item label="订单金额">
+            <el-form-item label="订单金额" prop="amount">
               <!--{{orderDetails.travelDate}}-->
             </el-form-item>
-            <el-form-item label="发票类型">
-              <el-radio v-model="type" label="1">个人</el-radio>
-              <el-radio v-model="type" label="0">单位</el-radio>
+            <el-form-item label="发票类型" prop="orderBillType">
+              <el-radio label="1" v-model="orderForm.orderBill.type">个人</el-radio>
+              <el-radio label="0" v-model="orderForm.orderBill.type">单位</el-radio>
             </el-form-item>
-            <el-form-item label="抬头:">
-              <el-input style="width: 23.2rem"></el-input>
+            <el-form-item label="抬头:" prop="orderBillTitle">
+              <el-input style="width: 23.2rem" v-model="orderForm.orderBill.title"></el-input>
             </el-form-item>
-            <el-form-item label="税号:">
-              <el-input style="width: 23.2rem"></el-input>
+            <el-form-item label="税号:" prop="orderBillTaxNum">
+              <el-input style="width: 23.2rem" v-model="orderForm.orderBill.taxNum"></el-input>
             </el-form-item>
-            <el-form-item label="收件人姓名:">
-              <el-input style="width: 23.2rem"></el-input>
+            <el-form-item label="收件人姓名:" prop="receiverName">
+              <el-input style="width: 23.2rem" v-model="orderForm.receiverName"></el-input>
             </el-form-item>
-            <el-form-item label="收件人电话:">
-              <el-input style="width: 23.2rem"></el-input>
+            <el-form-item label="收件人电话:" prop="receiverTel">
+              <el-input style="width: 23.2rem" v-model="orderForm.receiverTel"></el-input>
             </el-form-item>
-            <el-form-item label="收件地址:">
-              <el-select v-model="type" @change="" placeholder="省" class="selWidth">
+            <el-form-item label="收件地址:" prop="receiverAddress">
+              <el-select v-model="orderForm.provinceId" @change="" placeholder="省" class="selWidth">
                 <el-option v-for="item in provinceOp" :key="item.id" :label="item.name" :value="item.id">
                 </el-option>
               </el-select>
               <label>-</label>
-              <el-select v-model="type" @change="" placeholder="市" class="selWidth">
+              <el-select v-model="orderForm.cityId" @change="" placeholder="市" class="selWidth">
                 <el-option v-for="item in cityOp" :key="item.id" :label="item.name" :value="item.id">
                 </el-option>
               </el-select>
               <label>-</label>
-              <el-select v-model="type" placeholder="县" class="selWidth">
+              <el-select v-model="orderForm.countyId" placeholder="县" class="selWidth">
                 <el-option v-for="item in countyOp" :key="item.id" :label="item.name" :value="item.id">
                 </el-option>
                 <label>    </label>
               </el-select>
-              <el-input style="width: 23.2rem"></el-input>
+              <el-input style="width: 23.2rem" v-model="orderForm.receiverAddress"></el-input>
             </el-form-item>
           </div>
           <br>
@@ -240,28 +240,28 @@
           <div v-for="(traveler, $index) in domesticList">
             <div style="margin-left: 10rem"><label>出行人{{$index + 1}}：</label></div><br>
                 <div style="width: 95%" align="left">
-                  <el-form :model="traveler" label-width="200px">
+                  <el-form :model="traveler" :rules="rules" ref="orderForm" label-width="200px">
                     <div>
-                      <el-form-item>
+                      <el-form-item >
                         <el-radio v-model="traveler.ageGroup" label="1">成人</el-radio>
                         <el-radio v-model="traveler.ageGroup" label="2">儿童</el-radio>
                       </el-form-item>
-                      <el-form-item label="出行人姓名">
+                      <el-form-item label="出行人姓名" prop="tourerName">
                         <el-input v-model="traveler.tourerName" style="width: 23.2rem"></el-input>
                       </el-form-item>
-                      <el-form-item label="联系电话">
+                      <el-form-item label="联系电话" prop="linkPhone">
                         <el-input v-model="traveler.tourerName" style="width: 23.2rem"></el-input>
                       </el-form-item>
-                      <el-form-item label="证件类型">
+                      <el-form-item label="证件类型" prop="cardType">
                         <el-select v-model="traveler.cardType" placeholder="请选择" style="width: 23.2rem">
                           <el-option v-for="item in selectManOp.cardType" :key="item.value" :label="item.label" :value="item.value">
                           </el-option>
                         </el-select>
                       </el-form-item>
-                      <el-form-item label="证件号码">
+                      <el-form-item label="证件号码" prop="cardNumber">
                         <el-input v-model="traveler.cardNumber"  style="width: 23.2rem"></el-input>
                       </el-form-item>
-                      <el-form-item label="性别">
+                      <el-form-item label="性别" prop="gender">
                         <el-select v-model="traveler.gender" placeholder="请选择" style="width: 23.2rem">
                           <el-option v-for="item in selectManOp.sexOp" :key="item.value" :label="item.label" :value="item.value">
                           </el-option>
@@ -283,6 +283,7 @@
             <el-button type="primary" @click="">编辑</el-button>
             </el-form-item>
           </div>
+          <br>
         </el-form>
       </div>
     </div>
@@ -290,59 +291,22 @@
 </template>
 <script>
   import axios from 'axios'
-  import Vue from 'vue'
-  var api = Vue.prototype.api
+  import global from '../../global'
   export default {
     components: {
       axios,
-      api
+      global
     },
     data () {
       return {
         domesticList: [{}],
         selectManOp: {
           /** 性别 */
-          sexOp: [{
-            value: 0,
-            label: '未知'
-          }, {
-            value: 1,
-            label: '男'
-          }, {
-            value: 2,
-            label: '女'
-          }],
+          sexOp: global.genderOp,
           /** 护照 */
-          passportOp: [{
-            value: 0,
-            label: '普通因私护照'
-          }, {
-            value: 1,
-            label: '公务护照'
-          }, {
-            value: 2,
-            label: '外交护照'
-          }],
+          passportOp: global.passportOp,
           /** 证件类型 */
-          cardType: [{
-            value: 1,
-            label: '身份证'
-          }, {
-            value: 2,
-            label: '军官证'
-          }, {
-            value: 3,
-            label: '护照'
-          }, {
-            value: 4,
-            label: '港澳通行证'
-          }, {
-            value: 5,
-            label: '台湾通行证'
-          }, {
-            value: 99,
-            label: '其他'
-          }]
+          cardType: global.cardTypeOp
         },
         /** 弹框管理 */
         dialogM: {
@@ -367,30 +331,118 @@
         /** 县 */
         countyOp: [],
         areaData: [],
-        orderForm: {}
+        orderForm: {
+          linkMan: '', // 联系人
+          linkTel: '', // 联系电话
+          linkAdress: '', // 联系地址
+          linkEmail: '', // 联系邮箱
+          linkWeixin: '', // 联系微信
+          pid: '', // 产品id
+          tourGroup: '', // 团号
+          tourersNum: '', // 出行人数
+          tourers: {
+            subNum: {child: '', adult: ''},
+            domesticList: [], // 国内出行人
+            abroadList: [] // 国际出行人
+          },
+          travelDate: '', // 出行时间
+          suitId: '', // 套餐id
+          fromCity: '', // 出发地
+          payType: '', // 支付方式
+          amount: '', // 订单金额
+          orderBillType: '', // 发票类型
+          orderBillTitle: '', // 发票抬头
+          orderBillTaxNum: '', // 税号
+          orderBill: {
+            title: '',
+            type: '',
+            taxNum: ''
+          },
+          receiverName: '', // 收件人姓名
+          receiverTel: '', // 收件人电话
+          provinceId: '', /** 省id */
+          cityId: '', /** 市id */
+          countyId: '', /** 县id */
+          receiverAddress: '', // 收件人地址
+          tourerName: '', // 出行人姓名
+          linkPhone: '', // 联系电话
+          cardType: '', // 证件类型
+          cardNumber: '', // 证件号码
+          gender: '' // 性别
+        },
+        rules: {
+          linkMan: [
+          {required: true, message: '请输入联系人', trigger: 'change'}
+          ],
+          linkTel: [
+            {required: true, message: '请输入联系电话', trigger: 'blur'}
+          ],
+          pid: [
+            { required: true, message: '请选择线路产品', trigger: 'change' }
+          ],
+          tourGroup: [
+            { required: true, message: '请输入团号', trigger: 'blur' }
+          ],
+          tourersNum: [
+            { required: true, message: '请输入出行人', trigger: 'blur' },
+            { type: 'number', message: '必须是数字' }
+          ],
+          travelDate: [
+            { required: true, message: '出行时间不为空', trigger: 'change' }
+          ],
+          suitId: [
+            { required: true, message: '套餐不为空', trigger: 'blur' }
+          ],
+          fromCity: [
+            { required: true, message: '出发地不为空', trigger: 'blur' }
+          ],
+          payType: [
+            { required: true, message: '支付方式不为空', trigger: 'blur' }
+          ],
+          amount: [
+            { required: true, message: '订单金额不为空', trigger: 'blur' }
+          ],
+          orderBillType: [
+            { required: true, message: '请选择发票类型', trigger: 'blur' }
+          ],
+          orderBillTitle: [
+            { required: true, message: '请输入发票抬头', trigger: 'blur' }
+          ],
+          orderBillTaxNum: [
+            { required: true, message: '请输入发票税号', trigger: 'blur' }
+          ],
+          receiverName: [
+            { required: true, message: '请输入收件人姓名', trigger: 'blur' }
+          ],
+          receiverTel: [
+            { required: true, message: '请输入收件人电话', trigger: 'blur' }
+          ],
+          receiverAddress: [
+           { required: true, message: '请输入收件地址', trigger: 'blur' }
+          ],
+          tourerName: [
+            { required: true, message: '请输入出行人姓名', trigger: 'blur' }
+          ],
+          linkPhone: [
+            { required: true, message: '请输入联系电话', trigger: 'blur' }
+          ],
+          cardType: [
+            { required: true, message: '请选择证件类型', trigger: 'blur' }
+          ],
+          cardNumber: [
+            { required: true, message: '请输入证件号码', trigger: 'blur' }
+          ],
+          gender: [
+            { required: true, message: '请选择性别', trigger: 'blur' }
+          ]}
       }
     },
     created: function () {
       this.areaGet()
-//      this.authorization = this.$route.params.authorization
       this.proData()
-//      this.domesticList.push(this.traveler)
     },
-    updated: function () {
-//      console.log(this.distributerInfoDTO)
-    },
+    updated: function () {},
     methods: {
-      // 获取cookie
-      getCookie: function (cname) {
-        var name = cname + '='
-        var ca = document.cookie.split(';')
-        for (var i = 0; i < ca.length; i++) {
-          var c = ca[i]
-          while (c.charAt(0) === ' ') c = c.substring(1)
-          if (c.indexOf(name) !== -1) return c.substring(name.length, c.length)
-        }
-        return ''
-      },
       /** 添加出行人 */
       addTraveler () {
         console.log('添加')
@@ -410,10 +462,10 @@
       areaGet: function () {
 //        console.log('开始查询名称')
         var that = this
-        axios.get(api + 'common/search/getChinaAreas', {
+        axios.get(global.API + 'common/search/getChinaAreas', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Sys ' + that.getCookie('authorization')
+            'Authorization': 'Sys ' + global.getCookie('authorization')
           }
         }).then(function (response) {
           that.areaData = response.data
@@ -490,9 +542,9 @@
       /** 获取线路产品 */
       proData () {
         var that = this
-        axios.get("https://qa-api.yuelvhui.com/distrbuter/product/list/1/''", {
+        axios.get(global.API + "distrbuter/product/list/1/''", {
           headers: {
-            'Authorization': 'Sys ' + that.getCookie('authorization'),
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
