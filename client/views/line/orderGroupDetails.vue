@@ -35,55 +35,55 @@
     <el-row :gutter="20">
       <el-col :span="20"><div class="grid-content bg-purple"></div></el-col>
       <el-col :span="4"><div class="grid-content bg-purple">
-        <el-button type="primary" @click="getPdf">导出表单</el-button>
-        <el-button type="primary" @click="">打印</el-button>
+        <el-button type="primary" @click="timeMsg">导出表单</el-button>
+        <el-button type="primary" @click="getPrint">打印</el-button>
       </div></el-col>
     </el-row>
     <div class="pdf-dom" id="pdfDom" style="width: 100%">
     <el-row :gutter="20">
       <el-col :span="24">
         <div class="grid-content bg-purple" >
-            <table border="1"  style="line-height: 4rem">
+            <table border="1" cellspacing="0" cellpadding="0" style="line-height: 4rem">
               <tr>
-                <th colspan="14" class="th">{{groupDetails.pName}}</th>
+                <th colspan="14" class="th" style="text-align: center">{{groupDetails.pName}}</th>
               </tr>
               <tr>
-                <th class="th" colspan="1">产品编号</th>
-                <td colspan="4" class="th">{{groupDetails.pid}}</td>
-                <th class="th">团号</th>
-                <td colspan="2" class="th">{{groupDetails.tourGroup}}</td>
-                <th class="th" colspan="2">出行日期</th>
-                <td colspan="5" class="th">{{groupDetails.travelDate}}</td>
+                <th class="th" colspan="1" style="text-align: center">产品编号</th>
+                <td colspan="4" class="th" style="text-align: center">{{groupDetails.pid}}</td>
+                <th class="th" style="text-align: center">团号</th>
+                <td colspan="2" class="th" style="text-align: center">{{groupDetails.tourGroup}}</td>
+                <th class="th" colspan="2" style="text-align: center">出行日期</th>
+                <td colspan="5" class="th" style="text-align: center">{{groupDetails.travelDate}}</td>
               </tr>
               <tr>
-                <th class="th">出行人数</th>
-                <td colspan="4" class="th">{{groupDetails.tourersNum}}</td>
-                <th class="th" colspan="1">总支付金额(元)</th>
-                <td colspan="2" class="th">{{groupDetails.amountStr}}</td>
-                <th class="th" colspan="2"></th>
-                <td colspan="5" class="th"></td>
+                <th class="th" style="text-align: center">出行人数</th>
+                <td colspan="4" class="th" style="text-align: center">{{groupDetails.tourersNum}}</td>
+                <th class="th" colspan="1" style="text-align: center">总支付金额(元)</th>
+                <td colspan="2" class="th" style="text-align: center">{{amountStr}}</td>
+                <th class="th" colspan="2" style="text-align: center"></th>
+                <td colspan="5" class="th" style="text-align: center"></td>
               </tr>
               <tr>
-                <th class="th" :rowspan="userCount">出行人信息</th>
-                <td class="th">参团人姓名</td>
-                <td colspan="3" class="th">联系电话</td>
-                <td class="th">性 别</td>
-                <td class="th">成人/儿童</td>
-                <td class="th">证件类型</td>
-                <td colspan="2" class="th">证件号码</td>
-                <td colspan="2" class="th">所属代理商名称</td>
-                <td class="th">运营负责人</td>
+                <th class="th" :rowspan="userCount" style="text-align: center">出行人信息</th>
+                <td class="th" style="text-align: center">参团人姓名</td>
+                <td colspan="3" class="th" style="text-align: center">联系电话</td>
+                <td class="th" style="text-align: center">性 别</td>
+                <td class="th" style="text-align: center">成人/儿童</td>
+                <td class="th" style="text-align: center">证件类型</td>
+                <td colspan="2" class="th" style="text-align: center">证件号码</td>
+                <td colspan="2" class="th" style="text-align: center">所属代理商名称</td>
+                <td class="th" style="text-align: center">运营负责人</td>
               </tr>
               <tr v-for="item in groupDetails.tourers">
                 <!--<th class="th"></th>-->
-                <td class="th">{{item.tourerName}}</td>
-                <td colspan="3" class="th">{{item.mobile}}</td>
-                <td class="th">{{item.genderStr}}</td>
-                <td class="th">{{item.ageGroupStr}}</td>
-                <td class="th">{{item.cardTypeStr}}</td>
-                <td colspan="2" class="th">{{item.cardNumber}}</td>
-                <td colspan="2" class="th">{{item.distributerName}}</td>
-                <td class="th">{{item.operatorName}}</td>
+                <td class="th" style="text-align: center">{{item.tourerName}}</td>
+                <td colspan="3" class="th" style="text-align: center">{{item.mobile}}</td>
+                <td class="th" style="text-align: center">{{item.genderStr}}</td>
+                <td class="th" style="text-align: center">{{item.ageGroupStr}}</td>
+                <td class="th" style="text-align: center">{{item.cardTypeStr}}</td>
+                <td colspan="2" class="th" style="text-align: center">{{item.cardNumber}}</td>
+                <td colspan="2" class="th" style="text-align: center">{{item.distributerName}}</td>
+                <td class="th" style="text-align: center">{{item.operatorName}}</td>
               </tr>
             </table>
           </div>
@@ -112,6 +112,8 @@
         /** 团号 */
         tourGroup: '',
         groupDetails: {},  // 团数据
+        amountStr: '',
+        copyAmountStr: '',  // 总支付金额
         lineData: [], // 线路产品数据
         arrManage: {
           /** 运营人员 */
@@ -174,27 +176,45 @@
     updated: function () {
     },
     methods: {
+      /** 打印 */
+      getPrint () {
+        this.copyAmountStr = this.amountStr
+        this.amountStr = ''
+        setTimeout(function () {
+          let newWindow = window.open('_blank')
+          let codestr = document.getElementById('pdfDom').innerHTML
+          newWindow.document.write(codestr)
+          newWindow.document.close()
+          newWindow.print()
+        }, 300)
+      },
+      /** 定时执行函数 */
+      timeMsg () {
+        this.copyAmountStr = this.amountStr
+        this.amountStr = ''
+        var that = this
+        setTimeout(function () {
+          that.getPdf()
+        }, 300)
+      },
       getPdf: function () {
 //        var _this = this
         var pdfDom = document.querySelector('#pdfDom')
-//        console.log('打印当前div')
-//        console.log(pdfDom)
         html2canvas(pdfDom).then(
           function (canvas) {
             var contentWidth = canvas.width
             var contentHeight = canvas.height
             var pageHeight = contentWidth / 592.28 * 841.89
             var leftHeight = contentHeight
-            var position = 20
+            var position = 0
             var imgWidth = 555.28
+//            var imgHeight = canvas.height
             var imgHeight = 555.28 / contentWidth * contentHeight
-
             var pageData = canvas.toDataURL('image/jpeg', 1.0)
 
             var PDF = new JSPDF('', 'pt', 'a4')
-
             if (leftHeight < pageHeight) {
-              PDF.addImage(pageData, 'JPEG', 20, 20, imgWidth, imgHeight)
+              PDF.addImage(pageData, 'JPEG', 20, 0, imgWidth, imgHeight)
             } else {
               while (leftHeight > 0) {
                 PDF.addImage(pageData, 'JPEG', 20, position, imgWidth, imgHeight)
@@ -208,6 +228,8 @@
             PDF.save('团订单详情' + '.pdf')
           }
         )
+        this.amountStr = this.copyAmountStr
+        this.copyAmountStr = ''
 //        html2canvas()
       },
       /** 重置表单 */
@@ -255,7 +277,23 @@
           }
 //          that.groupDetails.tourersNum = that.groupDetails.adultNum + '成人' + that.groupDetails.childNum + '儿童' + that.groupDetails.oldNum + '老人'
           // 总支付金额
-          that.groupDetails.amountStr = (that.groupDetails.amount / 100) + '.00'
+          that.amountStr = (that.groupDetails.amount / 100) + '.00'
+//          var ss = {
+//            'tourerName': '游客姓名',
+//            'cardType': 1,
+//            'cardNumber': '证件号码',
+//            'gender': 1,
+//            'mobile': '18971132564',
+//            'ageGroup': 2,
+//            'distributerId': 1,
+//            'operatorId': 1
+//          }
+//          var arr = []
+//          for (var f = 0; f < 20; f++) {
+//            arr.push(ss)
+//          }
+//          that.groupDetails.tourers = arr
+          that.userCount = that.groupDetails.tourers.length + 1
           for (var w = 0; w < that.groupDetails.tourers.length; w++) {
             for (var i = 0; i < that.arrManage.tableData.length; i++) {
               if (that.arrManage.tableData[i].distributerId === that.groupDetails.tourers[w].distributerId) {
@@ -307,7 +345,6 @@
         }).then(function (response) {
           that.arrManage.managerOp = response.data.systemManagerDTOList
 //          that.authorization = response.data.authorization
-          that.userCount = that.arrManage.managerOp.length + 1
         }).catch(function (error) {
           console.log(error)
         })
@@ -361,7 +398,7 @@
     background-color: #f9fafc;
   }
   .th{
-    text-align: center;
+    /*text-align: center;*/
    }
   th{
     padding-right: 5.4px;

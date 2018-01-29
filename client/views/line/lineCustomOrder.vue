@@ -409,8 +409,6 @@
           pageIndex: that.lineOrder.pageIndex,
           pageSize: that.lineOrder.pageSize
         }
-        console.log('当前表单数据')
-        console.log(BODY)
         axios.post(global.API + 'distrbuter/admin/customized/list', BODY, {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
@@ -435,8 +433,6 @@
               }
             }
           }
-          console.log(that.orderData)
-          console.log('查询表单结束')
         }).catch(function (error) {
           console.log(error)
         })

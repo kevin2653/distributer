@@ -486,8 +486,7 @@
         this.orderPayForm.payAmount = row.payAmount
         this.orderPayForm.pid = row.pid
         this.orderPayForm.pName = row.pName
-        this.dialogM.paySuccess = true
-        this.timeMsg()
+//        this.timeMsg()
       },
       /** 定时执行函数 */
       timeMsg () {

@@ -31,7 +31,7 @@
           </div>
           <div>
             <el-form-item label="订单编号:">
-              {{orderDetails.requirementId}}
+              {{orderDetails.ordersn}}
             </el-form-item>
             <el-form-item label="需求创建时间:">
               {{orderDetails.createTime}}
@@ -259,9 +259,12 @@
       }
     },
     created: function () {
-      this.lineOrder = JSON.parse(this.$route.query.lineOrder)
+      if (typeof this.$route.query.lineOrder !== 'undefined') {
+        this.lineOrder = JSON.parse(this.$route.query.lineOrder)
+      }
       this.orderDetails = JSON.parse(this.$route.query.customDetails)
       this.orderDataGet(this.orderDetails)
+      this.getPayParam()
     },
     mounted: function () {},
     updated: function () {},
@@ -280,6 +283,21 @@
           }
         }).then(function (response) {
           console.log('打印二维码返回的数据')
+          console.log(response.data)
+        }).catch(function (error) {
+          console.log(error)
+        })
+      },
+      // 获取定制订单支付参数接口
+      getPayParam () {
+        var that = this
+        axios.get(global.API + 'distrbuter/admin/customized/getPaymentCode/' + that.orderDetails.ordersn, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Sys ' + global.getCookie('authorization')
+          }
+        }).then(function (response) {
+          console.log('打印定制订单支付参数')
           console.log(response.data)
         }).catch(function (error) {
           console.log(error)

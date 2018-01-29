@@ -46,13 +46,13 @@
               {{orderDetails.travelDate}}
             </el-form-item>
             <el-form-item label="退款状态:">
-              {{orderDetails.cancel_status}}
+              {{orderDetails.canceStatusStr}}
             </el-form-item>
             <el-form-item label="取消类型:">
-              {{orderDetails.cancelStr}}
+              {{orderDetails.cancelTypeStr}}
             </el-form-item>
             <el-form-item label="取消原因:">
-              {{orderDetails.cancel_reason}}
+              {{orderDetails.cancelReason}}
             </el-form-item>
             <el-form-item label="发票类型:">
               {{orderDetails.typeStr}}
@@ -101,10 +101,10 @@
               {{orderDetails.payAmountStr}}
             </el-form-item>
             <el-form-item label="优惠券:">
-              <!--{{orderDetails.amount}}-->
+              {{orderDetails.coupon}}
             </el-form-item>
             <el-form-item label="积分:">
-              <!--{{orderDetails.amount}}-->
+              {{orderDetails.integral}}
             </el-form-item>
             <el-form-item label="支付方式:">
               {{orderDetails.payType2Str}}
@@ -158,7 +158,7 @@
               </el-table-column>
               <el-table-column prop="ageGroupStr" label="成人/儿童" align="center">
               </el-table-column>
-              <el-table-column  label="联系电话" align="center">
+              <el-table-column prop="mobile" label="联系电话" align="center">
               </el-table-column>
             </el-table>
           </div>
@@ -218,7 +218,7 @@
     methods: {
       /** 返回上一层 */
       returnToUpLevel () {
-        this.$router.push({path: 'line/lineStandOrder', query: {lineOrder: this.$route.query.lineOrder}})
+        this.$router.push({path: '/line/lineStandOrder', query: {lineOrder: this.$route.query.lineOrder}})
       },
       // 获取订单详情
       getOrderDetails () {
@@ -266,25 +266,65 @@
               that.orderDetails.operatorName = that.managerOp[j].managerName
             }
           }
-          // 取消类型
-          that.orderDetails.cancelStr = ''
-          for (var q = 0; q < global.cancelType.length; q++) {
-            if (global.cancelType[q].value === that.orderDetails.cancel_type) {
-              that.orderDetails.cancelStr = global.cancelType[q].label
+          // 退款状态
+          that.orderDetails.canceStatusStr = ''
+          for (var a = 0; a < global.orderStandStatus.length; a++) {
+            if (global.orderStandStatus[a].value === that.orderDetails.cancelStatus) {
+              that.orderDetails.canceStatusStr = global.orderStandStatus[a].label
+            } else if (that.orderDetails.cancelStatus === 0) {
+              that.orderDetails.canceStatusStr = '---'
             }
           }
-          // 发票类型
-          that.orderDetails.typeStr = ''
-          for (var w = 0; w < global.invoiceType.length; w++) {
-            if (global.invoiceType[w].value === that.orderDetails.orderBill.type) {
-              that.orderDetails.typeStr = global.invoiceType[w].label
+          // 取消类型
+          that.orderDetails.cancelTypeStr = ''
+          for (var q = 0; q < global.cancelType.length; q++) {
+            if (global.cancelType[q].value === that.orderDetails.cancelType) {
+              that.orderDetails.cancelTypeStr = global.cancelType[q].label
+            } else if (that.orderDetails.cancelType === 0) {
+              that.orderDetails.cancelTypeStr = '---'
             }
+          }
+          // 取消原因
+          if (that.orderDetails.cancelReason === '') {
+            that.orderDetails.cancelReason = '---'
+          }
+          // 发票
+          that.orderDetails.typeStr = ''
+          if (that.orderDetails.orderBill.length < 1) {
+            that.orderDetails.typeStr = '---'
+            that.orderBill.title = '---'
+            that.orderBill.taxNum = '---'
+          } else {
+            for (var w = 0; w < global.invoiceType.length; w++) {
+              if (global.invoiceType[w].value === that.orderDetails.orderBill.type) {
+                that.orderDetails.typeStr = global.invoiceType[w].label
+              }
+            }
+          }
+          // 收件人
+          if (that.orderDetails.receiverName === '') {
+            that.orderDetails.receiverName = '---'
+          }
+          if (that.orderDetails.receiverTel === '') {
+            that.orderDetails.receiverTel = '---'
+          }
+          if (that.orderDetails.receiverAddress === '') {
+            that.orderDetails.receiverAddress = '---'
+          }
+          // 优惠券+积分
+          if (that.orderDetails.coupon === 0) {
+            that.orderDetails.coupon = '无'
+          }
+          if (that.orderDetails.integral === 0) {
+            that.orderDetails.integral = '无'
           }
           // 支付渠道
           that.orderDetails.payTypeStr = ''
           for (var e = 0; e < global.payChannel.length; e++) {
             if (global.payChannel[e].value === that.orderDetails.payType) {
               that.orderDetails.payTypeStr = global.payChannel[e].label
+            } else if (that.orderDetails.payType === 0) {
+              that.orderDetails.payTypeStr = '---'
             }
           }
           // 支付方式
@@ -292,6 +332,8 @@
           for (var r = 0; r < global.payType.length; r++) {
             if (global.payType[r].value === that.orderDetails.payType2) {
               that.orderDetails.payType2Str = global.payType[r].label
+            } else if (that.orderDetails.payType2 === 0) {
+              that.orderDetails.payType2Str = '---'
             }
           }
           // 出行人列表
