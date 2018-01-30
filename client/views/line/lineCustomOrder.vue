@@ -364,7 +364,7 @@
         var that = this
         var BODY = {
           ordersn: that.orderClaimForm.ordersn,
-          operationId: that.orderClaimForm.operationId
+          operatorId: that.orderClaimForm.operationId
         }
         axios.post(global.API + 'distrbuter/admin/order/setOperationManager', BODY, {
           headers: {
@@ -383,7 +383,8 @@
                 for (var j = 0; j < that.managerOp.length; j++) {
                   if (that.orderClaimForm.operationId === that.managerOp[j].managerId) {
                     console.log('命名成功')
-                    that.orderData[i].operationId = that.managerOp[j].managerName
+                    that.orderData[i].operatorName = that.managerOp[j].managerName
+                    console.log(that.orderData[i].operatorName)
                     that.orderClaimForm.ordersn = ''
                     that.orderClaimForm.operationId = ''
                   }
@@ -391,6 +392,7 @@
               }
             }
           }
+//          console.log(that.orderData)
         }).catch(function (error) {
           console.log(error)
         })
@@ -433,6 +435,7 @@
               }
             }
           }
+          console.log(that.orderData)
         }).catch(function (error) {
           console.log(error)
         })

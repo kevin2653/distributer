@@ -115,8 +115,9 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" disabled v-if="customOrderPayForm.amountStr === ''" style="margin-left: 8rem">生成支付二维码</el-button>
-              <el-button type="primary" @click="getPayORcode" v-else style="margin-left: 8rem">生成支付二维码</el-button>
+              <el-button type="primary" @click="makeCode" v-else style="margin-left: 8rem">生成支付二维码</el-button>
             </el-form-item>
+            <div id="qrCode" style="width: 100%;height:20rem;text-align: center"></div>
           </el-form>
         </div>
         <span slot="footer" class="dialog-footer" style="display: none">
@@ -129,10 +130,12 @@
 <script>
   import axios from 'axios'
   import global from '../../global'
+  import QRCode from 'qrcodejs2'
   export default {
     components: {
       axios,
-      global
+      global,
+      QRCode
     },
     data () {
       return {
@@ -145,6 +148,8 @@
         travelerNum: '',
         /** 当前订单详情 */
         orderDetails: {},
+        /** 二维码支付参数 */
+        payParams: {},
         /** 定制需求支付表单 */
         customOrderPayForm: {
           amountStr: ''
@@ -269,7 +274,20 @@
     mounted: function () {},
     updated: function () {},
     methods: {
-      // 点击生成支付二维码
+      // 生成二维码
+      makeCode () {
+        var text = 'weixin://wxpay/bizpayurl?sign=' + this.payParams.sign + '&appid=' + this.payParams.mchId + '&mch_id=' + this.payParams.mchId + '&product_id=' + this.payParams.productId + '&time_stamp=' + this.payParams.expireTime.toString().substring(0, 10) + '&nonce_str=' + this.payParams.sign
+        console.log(text)
+        var qrCode = new QRCode('qrCode', {
+          text: text,
+          width: 300,
+          height: 300,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H})
+        qrCode.makeCode()
+      },
+      // 点击下单
       getPayORcode () {
         var that = this
         var BODY = {
@@ -299,6 +317,8 @@
         }).then(function (response) {
           console.log('打印定制订单支付参数')
           console.log(response.data)
+          that.payParams = response.data
+//          that.makeCode()
         }).catch(function (error) {
           console.log(error)
         })

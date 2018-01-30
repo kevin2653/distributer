@@ -121,7 +121,6 @@
                 that.addAcountForm.managerName = ''
                 that.addAcountForm.managerAccount = ''
                 that.addAcountForm.managerPassword = ''
-                that.addAccountVisible = true
                 that.timeMsg()
                 that.$refs.addAcountForm.resetFields()
               }
