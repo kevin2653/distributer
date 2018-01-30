@@ -14,7 +14,7 @@
             <el-input type="password" v-model="systemLoginForm.managerPassword" placeholder="密码" style="width: 23.2rem"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="login" style="width: 23.2rem">登陆</el-button>
+            <el-button type="primary" @click="login" style="width: 23.2rem">登录</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -52,6 +52,13 @@
       enterHome () {
         this.$router.push({path: '/'})
       },
+      open () {
+        this.$message({
+          showClose: true,
+          message: '账号或者密码错误',
+          type: 'error'
+        })
+      },
       /** login */
       login () {
         this.$refs.systemLoginForm.validate((valid) => {
@@ -67,13 +74,15 @@
                 'Authorization': 'hero'
               }
             }).then(function (response) {
-              console.log('BBBBBBBBBBBBB')
+//              console.log('BBBBBBBBBBBBB')
               if (response.data.code === 'OK') {
-                console.log('AAAAAAAAAAAAAA')
+//                console.log('AAAAAAAAAAAAAA')
                 that.authorization = response.data.authorization
                 that.systemManager = response.data.sManager
                 window.location.reload()
                 that.enterHome()
+              } else if (response.data.code === 'error') {
+                that.open()
               }
             }).catch(function (error) {
               console.log(error)

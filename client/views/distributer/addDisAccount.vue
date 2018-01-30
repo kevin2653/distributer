@@ -1,5 +1,5 @@
 <template>
-  <div style="background-color: #f2f2f2" align="center">
+  <div style="background-color: #f2f2f2;min-height: 1200px" align="center">
     <div style="background-color: #ffffff;width:90%" align="left">
       <br>
       <div style="margin-right: 5rem" align="right">
@@ -28,9 +28,21 @@
               <el-button type="primary" @click="addAccount">创建账号</el-button>
             </el-form-item>
           </div>
+          <br>
         </el-form>
       </div>
     </div>
+    <!-- 创建成功弹窗 -->
+    <!--添加成功提示框-->
+    <el-dialog :visible.sync="addAccountVisible" width="30%" :modal-append-to-body="false" center>
+      <div align="center">
+        <i class="el-icon-success"></i><br>
+        <span>
+          新建代理商账号成功！<br>
+          5s之后跳转至代理商账号管理页
+        </span>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -41,6 +53,7 @@
     },
     data () {
       return {
+        addAccountVisible: false,
         distributerId: '',
         distributerName: '',
         dAccount: {},
@@ -53,6 +66,14 @@
       this.disNameDataGet()
     },
     methods: {
+      /** 定时执行函数 */
+      timeMsg () {
+        var that = this
+        setTimeout(function () {
+          that.addAccountVisible = false
+          that.returnToUpLevel()
+        }, 5000)
+      },
       /** 返回上一层 */
       returnToUpLevel () {
         this.$router.push({path: '/distributer/accountManagement', query: {distributerId: this.$route.query.distributerId, dAccount: this.$route.query.distributerAccount}})
@@ -94,6 +115,11 @@
         }).then(function (response) {
 //          console.log('返回账号开始')
           that.distributerAccount = response.data
+          if (that.distributerAccount.name !== null && that.distributerAccount.name !== '') {
+            that.addAccountVisible = true
+            that.timeMsg()
+          }
+          console.log(response.data)
 //          console.log('返回账号结束')
         }).catch(function (error) {
           console.log(error)
