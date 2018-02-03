@@ -61,16 +61,16 @@
             </el-table-column>
             <el-table-column label="操作员账号" prop="operatorAccount" align="center">
             </el-table-column>
-            <el-table-column label="状态" prop="managerStatusId" align="center">
+            <el-table-column label="状态" prop="managerStatusIdStr" align="center">
             </el-table-column>
             <el-table-column label="创建时间" prop="createTime" align="center">
             </el-table-column>
             <el-table-column align="center" width="360" label="操作">
-              <template slot-scope="scope" center v-if="scope.row.managerStatusId !== '' && managerTableData.length > 0">
+              <template slot-scope="scope" center v-if="scope.row.managerStatusId !== 2 && managerTableData.length > 0">
                 <el-button round size="mini" @click="restPassword(scope.$index, scope.row)">重置密码</el-button>
                 <el-button round size="mini" @click="delAccount(scope.$index, scope.row)" >删除</el-button>
-                <el-button round size="mini" @click="ableAccount(scope.$index, scope.row)" v-if="scope.row.managerStatusId === '禁用'">启用</el-button>
-                <el-button round size="mini" @click="disableAccount(scope.$index, scope.row)" v-if="scope.row.managerStatusId == '正常'">禁用</el-button>
+                <el-button round size="mini" @click="ableAccount(scope.$index, scope.row)" v-if="scope.row.managerStatusId === 0">启用</el-button>
+                <el-button round size="mini" @click="disableAccount(scope.$index, scope.row)" v-if="scope.row.managerStatusId == 1">禁用</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -226,7 +226,8 @@
           this.updateOperator(this.multipleSelection[i].managerId, operatorAccount)
           for (var j = 0; j < this.managerTableData.length; j++) {
             if (this.multipleSelection[i].managerId === this.managerTableData[j].managerId) {
-              this.managerTableData[j].managerStatusId = '禁用'
+              this.managerTableData[j].managerStatusId = 0
+              this.managerTableData[j].managerStatusStr = '禁用'
             }
           }
         }
@@ -246,7 +247,8 @@
           this.updateOperator(that.multipleSelection[i].managerId, operatorAccount)
           for (var j = 0; j < that.managerTableData.length; j++) {
             if (that.multipleSelection[i].managerId === that.managerTableData[j].managerId) {
-              that.managerTableData[j].managerStatusId = ''
+              that.managerTableData[j].managerStatusId = 2
+              that.managerTableData[j].managerStatusIdStr = ''
               that.managerTableData[j].createTime = ''
               that.managerTableData[j].managerName = ''
             }
@@ -270,7 +272,8 @@
         this.updateOperator(row.managerId, operatorAccount)
         for (var j = 0; j < this.managerTableData.length; j++) {
           if (row.managerId === this.managerTableData[j].managerId) {
-            this.managerTableData[j].managerStatusId = '禁用'
+            this.managerTableData[j].managerStatusIdStr = '禁用'
+            this.managerTableData[j].managerStatusId = 0
           }
         }
       },
@@ -285,7 +288,8 @@
         this.modifyStatus(managerId, managerStatusId)
         for (var j = 0; j < this.managerTableData.length; j++) {
           if (row.managerId === this.managerTableData[j].managerId) {
-            this.managerTableData[j].managerStatusId = '正常'
+            this.managerTableData[j].managerStatusIdStr = '正常'
+            this.managerTableData[j].managerStatusId = 1
           }
         }
       },
@@ -300,7 +304,8 @@
         this.modifyStatus(managerId, managerStatusId)
         for (var j = 0; j < that.managerTableData.length; j++) {
           if (row.managerId === that.managerTableData[j].managerId) {
-            that.managerTableData[j].managerStatusId = ''
+            that.managerTableData[j].managerStatusIdStr = ''
+            that.managerTableData[j].managerStatusId = 2
             that.managerTableData[j].createTime = ''
             that.managerTableData[j].managerName = ''
           }
@@ -355,9 +360,28 @@
       /** 多选框触发 */
       handleSelectionChange (val) {
         this.multipleSelection = val
-        this.buttonDel = false
-        this.buttonDis = false
-        this.buttonAbl = false
+        var delNum = 0
+        var disNum = 0
+        if (this.multipleSelection.length > 0) {
+          for (var i = 0; i < this.multipleSelection.length; i++) {
+            if (this.multipleSelection[i].managerStatusId !== 2) {
+              delNum++
+            }
+            if (this.multipleSelection[i].managerStatusId === 1) {
+              disNum++
+            }
+          }
+          if (delNum === this.multipleSelection.length) {
+            this.buttonDel = false
+          } else {
+            this.buttonDel = true
+          }
+          if (disNum === this.multipleSelection.length) {
+            this.buttonDis = false
+          } else {
+            this.buttonDis = true
+          }
+        }
 //        console.log('打印选择内容')
 //        console.log(this.multipleSelection)
       },
@@ -390,16 +414,16 @@
             if (that.managerTableData[i].managerStatusId === 2) {
 //              console.log(that.managerTableData[i].managerStatusId)
 //              console.log('修改表单')
-              that.managerTableData[i].managerStatusId = ''
+              that.managerTableData[i].managerStatusIdStr = ''
               that.managerTableData[i].createTime = ''
               that.managerTableData[i].managerName = ''
             }
             if (that.managerTableData[i].managerStatusId === 1) {
-              that.managerTableData[i].managerStatusId = '正常'
+              that.managerTableData[i].managerStatusIdStr = '正常'
               that.managerTableData[i].createTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
             }
             if (that.managerTableData[i].managerStatusId === 0) {
-              that.managerTableData[i].managerStatusId = '禁用'
+              that.managerTableData[i].managerStatusIdStr = '禁用'
               that.managerTableData[i].createTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
               that.isDisabled = '启用'
             }

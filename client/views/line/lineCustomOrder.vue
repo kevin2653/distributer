@@ -141,7 +141,8 @@
             <el-table-column align="center" width="240" label="操作">
               <template slot-scope="scope" center>
                 <el-button round size="mini" @click="seeDetails(scope.$index, scope.row)">查看详情</el-button>
-                <el-button round size="mini" @click="linkLine(scope.$index, scope.row)">关联线路</el-button>
+                <!--暂时取消-->
+                <!--<el-button round size="mini" @click="linkLine(scope.$index, scope.row)">关联线路</el-button>-->
               </template>
             </el-table-column>
           </el-table>

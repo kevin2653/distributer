@@ -92,7 +92,7 @@
           </div>
           <div>
             <el-form-item label="支付单号:">
-              <!--{{distrubuterInfo.contactName}}-->
+              {{orderDetails.payFormNo}}
             </el-form-item>
             <el-form-item label="订单金额:">
               {{orderDetails.amountStr}}
@@ -118,35 +118,35 @@
             <label>出行人信息</label>
           </div>
           <br>
-          <div style="display: none">
-            <el-table border style="width: 100%">
-              <el-table-column  label="出行人姓名" align="center">
+          <div v-show="orderDetails.isInternational === 1">
+            <el-table :data="travelerTable" border style="width: 100%">
+              <el-table-column prop="tourerName" label="出行人姓名" align="center">
               </el-table-column>
-              <el-table-column label="护照类别" align="center">
+              <el-table-column prop="passportTypeStr" label="护照类别" align="center">
               </el-table-column>
-              <el-table-column label="国家码" align="center">
+              <el-table-column prop="countryId" label="国家码" align="center">
               </el-table-column>
-              <el-table-column  label="护照号" align="center">
+              <el-table-column prop="cardNumber" label="护照号" align="center">
               </el-table-column>
-              <el-table-column label=" 性别" align="center">
+              <el-table-column prop="genderStr" label=" 性别" align="center">
               </el-table-column>
-              <el-table-column label="成人/儿童" align="center">
+              <el-table-column prop="ageGroupStr" label="成人/儿童" align="center">
               </el-table-column>
-              <el-table-column  label="出生日期" align="center">
+              <el-table-column prop="birthday"  label="出生日期" align="center">
               </el-table-column>
-              <el-table-column label="出生地点" align="center">
+              <el-table-column prop="birthAdress" label="出生地点" align="center">
               </el-table-column>
-              <el-table-column label="签发日期" align="center">
+              <el-table-column prop="issueStartTime" label="签发日期" align="center">
               </el-table-column>
-              <el-table-column  label="有效日期" align="center">
+              <el-table-column prop="issueEndTime"  label="有效日期" align="center">
               </el-table-column>
-              <el-table-column label="签发地点" align="center">
+              <el-table-column prop="issueAreaName" label="签发地点" align="center">
               </el-table-column>
-              <el-table-column label="联系电话" align="center">
+              <el-table-column prop="mobile" label="联系电话" align="center">
               </el-table-column>
             </el-table>
           </div>
-          <div>
+          <div v-show="orderDetails.isInternational === 0">
             <el-table :data="travelerTable" border style="width: 100%">
               <el-table-column prop="tourerName"  label="出行人姓名" align="center">
               </el-table-column>
@@ -195,6 +195,8 @@
         orderBill: {},
         /** 出行人列表 */
         travelerTable: [],
+        /** 护照列表 */
+        passportList: [],
         /** 运营人员 */
         managerOp: [{}],
         /** 代理商 */
@@ -204,12 +206,15 @@
         /** 代理商订单结算 */
         disCommissionData: [{}],
         /** 当前订单详情 */
-        orderDetails: {}
+        orderDetails: {},
+        /** 省市县 */
+        areaData: []
       }
     },
     created: function () {
       this.ordersn = this.$route.query.ordersn
-      this.orderDataGet()
+      this.areaGet()
+//      this.orderDataGet()
 //      console.log('打印全局变量')
 //      console.log(global)
     },
@@ -218,7 +223,11 @@
     methods: {
       /** 返回上一层 */
       returnToUpLevel () {
-        this.$router.push({path: '/line/lineStandOrder', query: {lineOrder: this.$route.query.lineOrder}})
+        if (this.$route.query.sign === 'stand') {
+          this.$router.push({path: '/line/lineStandOrder', query: {lineOrder: this.$route.query.lineOrder}})
+        } else {
+          this.$router.push({path: '/line/lineStandRefund', query: {lineOrder: this.$route.query.lineOrder}})
+        }
       },
       // 获取订单详情
       getOrderDetails () {
@@ -236,6 +245,13 @@
           that.orderDetails = response.data
           that.orderBill = response.data.orderBill
           that.travelerTable = response.data.tourers.list
+          if (typeof response.data.tourers.possportList !== 'undefined') {
+            that.passportList = response.data.tourers.possportList
+          }
+          // 支付单号
+          if (that.orderDetails.payFormNo === '') {
+            that.orderDetails.payFormNo = '---'
+          }
           // 出行人数
           that.orderDetails.tourersNum = ''
           if (that.orderDetails.tourers.subNum.adult !== 0) {
@@ -336,6 +352,7 @@
               that.orderDetails.payType2Str = '---'
             }
           }
+//          that.orderDetails.isInternational = 1
           // 出行人列表
           for (var t = 0; t < that.travelerTable.length; t++) {
             // 证件类型
@@ -362,9 +379,47 @@
                 that.travelerTable[t].ageGroupStr = global.ageGroupOp[p].label
               }
             }
+            // 匹配护照信息
+            for (var x = 0; x < that.passportList.length; x++) {
+              if (that.travelerTable[t].id === that.passportList[x].linkManId) {
+                that.travelerTable[t].countryId = that.passportList[x].countryId
+                that.travelerTable[t].cardNumber = that.passportList[x].cardNumber
+                that.travelerTable[t].birthday = that.passportList[x].birthday
+                that.travelerTable[t].birthAdress = ''
+                that.travelerTable[t].issueStartTime = ''
+                that.travelerTable[t].issueEndTime = that.passportList[x].issueEndTime
+//                that.travelerTable[t].issueAreaId = that.passportList[x].issueAreaId
+                that.travelerTable[t].mobile = that.passportList[x].mobile
+                for (var v = 0; v < global.passportType.length; v++) {
+                  if (global.passportType[v].value === that.passportList[x].type) {
+                    that.travelerTable[t].passportTypeStr = global.passportType[v].label
+                  }
+                }
+                for (var m = 0; m < that.areaData.length; m++) {
+                  if (that.areaData[m].id === that.passportList[x].issueAreaId) {
+                    that.travelerTable[t].issueAreaName = that.areaData[m].name
+                  }
+                }
+              }
+            }
           }
           console.log(that.orderDetails)
           console.log('接收数据结束')
+        }).catch(function (error) {
+          console.log(error)
+        })
+      },
+      /** 查询省市县名称 */
+      areaGet: function () {
+        var that = this
+        axios.get(global.API + 'common/search/getChinaAreas', {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Sys ' + global.getCookie('authorization')
+          }
+        }).then(function (response) {
+          that.areaData = response.data
+          that.orderDataGet()
         }).catch(function (error) {
           console.log(error)
         })

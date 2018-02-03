@@ -55,7 +55,7 @@
         <el-col :span="4">
           <div class="grid-content bg-purple">
             <el-form-item label="退款状态">
-              <el-select v-model="lineOrder.isBeenManage"  placeholder="请选择" style="width: 10rem">
+              <el-select v-model="lineOrder.cancelStatus"  placeholder="请选择" style="width: 10rem">
                 <el-option
                   v-for="item in refundStatusOp"
                   :key="item.value"
@@ -103,7 +103,7 @@
         <el-col :span="4">
           <div class="grid-content bg-purple">
             <el-form-item label="运营负责人">
-              <el-select v-model="lineOrder.operationId" placeholder="请选择" style="width: 10rem">
+              <el-select v-model="lineOrder.operatorId" placeholder="请选择" style="width: 10rem">
                 <el-option
                   v-for="item in managerOp"
                   :key="item.managerId"
@@ -136,26 +136,26 @@
     <el-row>
       <el-col :span="24">
         <div class="grid-content bg-purple-dark">
-          <el-table :data="orderData" tooltip-effect="dark" @selection-change="handleSelectionChange" border style="width: 100%" >
-            <el-table-column type="selection" label="全选" width="55">
+          <el-table :data="orderData" tooltip-effect="dark" border style="width: 100%" >
+            <!--<el-table-column type="selection" label="全选" width="55">-->
+            <!--</el-table-column>-->
+            <el-table-column label="线路产品名称" prop="pName" align="center">
             </el-table-column>
-            <el-table-column label="线路产品名称" prop="ordersn" align="center">
-            </el-table-column>
-            <el-table-column label="团号" align="center">
+            <el-table-column label="团号" prop="tourGroup" align="center">
             </el-table-column>
             <el-table-column label="联系人姓名" prop="linkMan" align="center">
             </el-table-column>
-            <el-table-column label="退款金额(元)" prop="linkTel" align="center">
+            <el-table-column label="退款金额(元)" prop="amountStr" align="center">
             </el-table-column>
-            <el-table-column label="退款状态" prop="tourGroup" align="center">
+            <el-table-column label="退款状态" prop="statusStr" align="center">
             </el-table-column>
-            <el-table-column label="订单取消时间" align="center">
+            <el-table-column label="订单取消时间" prop="cancelTime" align="center">
             </el-table-column>
-            <el-table-column label="退款时间" prop="distributerId" align="center">
+            <el-table-column label="退款时间" prop="refundTime" align="center">
             </el-table-column>
-            <el-table-column label="代理商名称" prop="distributerId" align="center">
+            <el-table-column label="代理商名称" prop="distributerName" align="center">
             </el-table-column>
-            <el-table-column label="运营负责人" prop="operationId" align="center">
+            <el-table-column label="运营负责人" prop="operatorName" align="center">
             </el-table-column>
             <el-table-column align="center" width="240" label="操作">
               <template slot-scope="scope" center>
@@ -186,9 +186,9 @@
           <el-form :model="orderAuditForm" class="demo-form-inline">
             <el-form-item label="订单编号">{{orderAuditForm.ordersn}}</el-form-item>
             <el-form-item label="线路名称">{{orderAuditForm.pName}}</el-form-item>
-            <el-form-item label="订单金额">{{orderAuditForm.amount}}</el-form-item>
+            <el-form-item label="订单金额">{{orderAuditForm.amountStr}}</el-form-item>
             <el-form-item label="退款金额">
-              <el-input style="width: 10rem"></el-input>
+              <el-input style="width: 10rem" v-model="orderAuditForm.refundAmountStr"></el-input><label>元</label>
             </el-form-item>
           </el-form>
         </div>
@@ -224,19 +224,25 @@
         },
         /** 退款状态 */
         refundStatusOp: [{
-          value: 0,
+          value: 201,
           label: '待审核'
         }, {
-          value: 1,
+          value: 205,
           label: '已审核'
         }, {
-          value: 2,
-          label: '已退款'
+          value: 211,
+          label: '退款失败'
+        }, {
+          value: 213,
+          label: '退款成功(人工)'
+        }, {
+          value: 215,
+          label: '退款成功(系统)'
         }],
         /** 运营人员 */
-        managerOp: [{}],
-        /** 多选框 */
-        multipleSelection: [],
+        managerOp: [],
+//        /** 多选框 */
+//        multipleSelection: [],
         /** 头部信息 */
         authorization: '',
         /** 代理商弹框表格 */
@@ -259,17 +265,16 @@
         /** 退款线路订单表格 */
         orderData: [],
         /** 关联线路产品弹框表格 */
-        lineData: [{}],
+        lineData: [],
         lineLikeData: [],
         totalNum: 0, /** 查询总条数 */
         /** form表单数据 */
         lineOrder: {
           distributerId: '', /** 代理商id */
           tourGroup: '', /** 团号 */
-          operationId: '', /** 运营管理人员 */
-          isBeenManage: '', /** 是否分配运营负责人 */
-          addTime: '', /** 下单开始时间 */
-          endTime: '', /** 下单结束时间 */
+          operatorId: '', /** 运营管理人员 */
+          pid: '', /** 产品id */
+          cancelStatus: '', /** 退款状态 */
           pageIndex: 1, /** 当前页 */
           pageSize: 5 /** 每页显示条数 */
         },
@@ -277,12 +282,17 @@
         orderAuditForm: {
           ordersn: '', /** 订单编号 */
           pName: '', /** 产品名称 */
-          amount: '', /** 订单金额 */
-          operationId: ''
+          amountStr: '', /** 订单金额 */
+          refundAmountStr: '', // 退款金额
+          operatorId: ''
         }
       }
     },
     created: function () {
+      if (typeof this.$route.query.lineOrder !== 'undefined') {
+        this.lineOrder = JSON.parse(this.$route.query.lineOrder)
+        this.onSubmit()
+      }
       this.dataGet()
     },
     updated: function () {
@@ -291,74 +301,87 @@
       /** 分页 */
       handleSizeChange (val) {
         this.lineOrder.pageSize = val
-        console.log('当前数量')
-        console.log(this.lineOrder.pageSize)
+//        console.log('当前数量')
+//        console.log(this.lineOrder.pageSize)
         this.onSubmit()
-        console.log(`每页 ${val} 条`)
+//        console.log(`每页 ${val} 条`)
       },
       handleCurrentChange (val) {
         this.lineOrder.pageIndex = val
         this.onSubmit()
-        console.log(`当前页: ${val}`)
+//        console.log(`当前页: ${val}`)
       },
       /** 查看详情 */
       seeDetails (index, row) {
-        this.$router.push({name: '订单详情', params: {ordersn: row.ordersn, authorization: this.authorization}})
+        this.$router.push({path: '/line/lineStandOrder/lineStandDetails', query: {ordersn: row.ordersn, lineOrder: JSON.stringify(this.lineOrder), sign: 'refund'}})
         console.log(row)
       },
       /** 订单审核 */
       orderAudit (index, row) {
         this.orderAuditForm.ordersn = row.ordersn
         this.orderAuditForm.pName = row.pName
-        this.orderAuditForm.amount = row.amount
+        this.orderAuditForm.amountStr = row.amountStr
         this.dialogM.orderAuditDialog = true
       },
       /** 退款金额设置 */
       orderAuditSubmit () {
-        this.dialogM.orderAuditDialog = false
-      },
-      /** form表单提交 */
-      onSubmit () {
         var that = this
-        var BODY = {
-          type: 100, // 产品类型(定制需求订单)
-          distributerId: that.lineOrder.distributerId, // 代理商id
-          tourGroup: that.lineOrder.tourGroup, // 团号
-          operationId: that.lineOrder.operationId, // 运营人员
-          isBeenManage: that.lineOrder.isBeenManage, // 是否分配运营人员
-          addTime: that.lineOrder.addTime,  // 下单开始时间
-          endTime: that.lineOrder.endTime, // 下单结束时间
-          pageIndex: that.lineOrder.pageIndex,
-          pageSize: that.lineOrder.pageSize
-        }
-        console.log('当前表单数据')
-        console.log(BODY)
-        axios.post(global.API + 'distrbuter/admin/order/list', BODY, {
+        console.log((Number(this.orderAuditForm.refundAmountStr) * 100))
+        axios.get(global.API + 'distrbuter/admin/order/refund/' + this.orderAuditForm.ordersn + '/' + (Number(this.orderAuditForm.refundAmountStr) * 100), {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
-          console.log('开始查询表单')
           console.log(response.data)
+          if (response.data.code === 'SUCCESS') {
+            that.dialogM.orderAuditDialog = false
+            that.orderAuditForm.refundAmountStr = ''
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
+      },
+      /** form表单提交 */
+      onSubmit () {
+        var that = this
+        var BODY = {
+          pid: that.lineOrder.pid, // 产品id
+          distributerId: that.lineOrder.distributerId, // 代理商id
+          tourGroup: that.lineOrder.tourGroup, // 团号
+          operatorId: that.lineOrder.operatorId, // 运营人员
+          cancelStatus: that.lineOrder.cancelStatus, // 退款状态
+          pageIndex: that.lineOrder.pageIndex,
+          pageSize: that.lineOrder.pageSize
+        }
+//        console.log('当前表单数据')
+//        console.log(BODY)
+        axios.post(global.API + '/distrbuter/admin/order/orderRefund/list', BODY, {
+          headers: {
+            'Authorization': 'Sys ' + global.getCookie('authorization'),
+            'Content-Type': 'application/json'
+          }
+        }).then(function (response) {
+//          console.log('开始查询表单')
+//          console.log(response.data)
           that.orderData = response.data.orderList
-          that.totalNum = response.data.orderList.length
+          that.totalNum = response.data.totalNum
           for (var i = 0; i < that.orderData.length; i++) {
-//            that.orderData[i].amount = (that.orderData[i].amount) / 100
+            that.orderData[i].amountStr = (that.orderData[i].amount) / 100 + '.00'
             for (var j = 0; j < that.tableData.length; j++) {
               if (that.orderData[i].distributerId === that.tableData[j].distributerId) {
-                that.orderData[i].distributerId = that.tableData[j].distributerName
+                that.orderData[i].distributerName = that.tableData[j].distributerName
               }
             }
-            var num = Number(that.orderData[i].operationId)
+            var num = Number(that.orderData[i].operatorId)
             for (var k = 0; k < that.managerOp.length; k++) {
               if (num === that.managerOp[k].managerId) {
-                that.orderData[i].operationId = that.managerOp[k].managerName
+                that.orderData[i].operatorName = that.managerOp[k].managerName
               }
             }
           }
-          console.log(that.orderData)
-          console.log('查询表单结束')
+//          console.log(that.orderData)
+//          console.log('查询表单结束')
         }).catch(function (error) {
           console.log(error)
         })
@@ -367,7 +390,7 @@
       onReset () {
         this.lineOrder.distributerId = ''
         this.lineOrder.tourGroup = ''
-        this.lineOrder.operationId = ''
+        this.lineOrder.operatorId = ''
         this.lineOrder.isBeenManage = ''
         this.lineOrder.addTime = ''
         this.selectDistributer = '选择代理商'
@@ -383,15 +406,15 @@
         console.log(this.lineOrder)
       },
       /** 多选框触发 */
-      handleSelectionChange (val) {
-        var that = this
-        that.multipleSelection = val
-        if (that.multipleSelection.length === 1) {
-          that.buttonM.orderClaim = false
-        } else {
-          that.buttonM.orderClaim = true
-        }
-      },
+//      handleSelectionChange (val) {
+//        var that = this
+//        that.multipleSelection = val
+//        if (that.multipleSelection.length === 1) {
+//          that.buttonM.orderClaim = false
+//        } else {
+//          that.buttonM.orderClaim = true
+//        }
+//      },
       /** input改变，模糊查询代理商 */
       inputChangeDis () {
         var that = this
@@ -400,7 +423,7 @@
             that.disLikeTableData.push(that.tableData[i])
           }
         }
-        console.log(that.disLikeTableData)
+//        console.log(that.disLikeTableData)
         that.tableData = that.disLikeTableData
       },
       /** 回填代理商 */
@@ -493,7 +516,7 @@
           }
         }).then(function (response) {
           that.managerOp = response.data.systemManagerDTOList
-          that.authorization = response.data.authorization
+//          that.authorization = response.data.authorization
           that.proData()
 //          console.log(that.managerOp)
         }).catch(function (error) {

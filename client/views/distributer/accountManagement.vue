@@ -91,16 +91,16 @@
             </el-table-column>
             <el-table-column label="运营负责人" prop="sManager.managerName" align="center">
             </el-table-column>
-            <el-table-column label="状态" prop="accountStatusId" align="center">
+            <el-table-column label="状态" prop="accountStatusIdStr" align="center">
             </el-table-column>
-            <el-table-column label="创建时间" prop="createTime" align="center">
+            <el-table-column label="创建时间" prop="createTimeStr" align="center">
             </el-table-column>
             <el-table-column align="center" width="280" label="操作">
-              <template slot-scope="scope" center v-if="scope.row.accountStatusId !== ''">
+              <template slot-scope="scope" center v-if="scope.row.accountStatusId !== 2">
                 <el-button round size="mini" @click="restPassword(scope.$index, scope.row)">重置密码</el-button>
                 <el-button round size="mini" @click="delAccount(scope.$index, scope.row)">删除</el-button>
-                <el-button round size="mini" @click="disableAccount(scope.$index, scope.row)" v-if="scope.row.accountStatusId === '正常'">禁用</el-button>
-                <el-button round size="mini" @click="ableAccount(scope.$index, scope.row)" v-if="scope.row.accountStatusId === '禁用'">启用</el-button>
+                <el-button round size="mini" @click="disableAccount(scope.$index, scope.row)" v-if="scope.row.accountStatusId === 1">禁用</el-button>
+                <el-button round size="mini" @click="ableAccount(scope.$index, scope.row)" v-if="scope.row.accountStatusId === 0">启用</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -266,7 +266,8 @@
           accountId.push(this.multipleSelection[i].accountId)
           for (var j = 0; j < this.ContableData.length; j++) {
             if (this.multipleSelection[i].accountId === this.ContableData[j].accountId) {
-              this.ContableData[j].accountStatusId = '禁用'
+              this.ContableData[j].accountStatusIdStr = '禁用'
+              this.ContableData[j].accountStatusId = 0
             }
           }
         }
@@ -279,8 +280,9 @@
           accountId.push(that.multipleSelection[i].accountId)
           for (var j = 0; j < that.ContableData.length; j++) {
             if (that.multipleSelection[i].accountId === that.ContableData[j].accountId) {
-              that.ContableData[j].accountStatusId = ''
-              that.ContableData[j].createTime = ''
+              that.ContableData[j].accountStatusIdStr = ''
+              that.ContableData[j].createTimeStr = ''
+              that.ContableData[j].accountStatusId = 2
               that.ContableData[j].name = ''
             }
           }
@@ -303,7 +305,8 @@
           accountId.push(this.multipleSelection[i].accountId)
           for (var j = 0; j < this.ContableData.length; j++) {
             if (this.multipleSelection[i].accountId === this.ContableData[j].accountId) {
-              this.ContableData[j].accountStatusId = '正常'
+              this.ContableData[j].accountStatusIdStr = '正常'
+              this.ContableData[j].accountStatusId = 1
             }
           }
         }
@@ -316,7 +319,8 @@
         this.modifyStatus(accountId, accountStatusId)
         for (var j = 0; j < this.ContableData.length; j++) {
           if (row.accountId === this.ContableData[j].accountId) {
-            this.ContableData[j].accountStatusId = '禁用'
+            this.ContableData[j].accountStatusIdStr = '禁用'
+            this.ContableData[j].accountStatusId = 0
           }
         }
       },
@@ -328,7 +332,8 @@
         this.modifyStatus(accountId, accountStatusId)
         for (var j = 0; j < this.ContableData.length; j++) {
           if (row.accountId === this.ContableData[j].accountId) {
-            this.ContableData[j].accountStatusId = '正常'
+            this.ContableData[j].accountStatusIdStr = '正常'
+            this.ContableData[j].accountStatusId = 1
           }
         }
       },
@@ -337,14 +342,15 @@
         var accountId = []
         var that = this
         accountId.push(row.accountId)
-        console.log('id数组')
-        console.log(accountId)
+//        console.log('id数组')
+//        console.log(accountId)
         var accountStatusId = 2
         this.modifyStatus(accountId, accountStatusId)
         for (var j = 0; j < that.ContableData.length; j++) {
           if (row.accountId === that.ContableData[j].accountId) {
-            that.ContableData[j].accountStatusId = ''
-            that.ContableData[j].createTime = ''
+            that.ContableData[j].accountStatusIdStr = ''
+            that.ContableData[j].accountStatusId = 2
+            that.ContableData[j].createTimeStr = ''
             that.ContableData[j].name = ''
           }
         }
@@ -393,15 +399,49 @@
       /** 多选框触发 */
       handleSelectionChange (val) {
         this.multipleSelection = val
+        var delNum = 0
+        var disNum = 0
+        var ablNum = 0
+        if (this.multipleSelection.length === 0) {
+          this.buttonMan.buttonAdd = true
+          this.buttonMan.buttonDel = true
+          this.buttonMan.buttonDis = true
+          this.buttonMan.buttonAbl = true
+        }
         if (this.multipleSelection.length === 1) {
           this.buttonMan.buttonAdd = false
         }
         if (this.multipleSelection.length > 1) {
           this.buttonMan.buttonAdd = true
         }
-        this.buttonMan.buttonDel = false
-        this.buttonMan.buttonDis = false
-        this.buttonMan.buttonAbl = false
+        if (this.multipleSelection.length > 0) {
+          for (var i = 0; i < this.multipleSelection.length; i++) {
+            if (this.multipleSelection[i].accountStatusId === 0) {
+              ablNum++
+            }
+            if (this.multipleSelection[i].accountStatusId === 1) {
+              disNum++
+            }
+            if (this.multipleSelection[i].accountStatusId !== 2) {
+              delNum++
+            }
+          }
+          if (ablNum === this.multipleSelection.length) {
+            this.buttonMan.buttonAbl = false
+          } else {
+            this.buttonMan.buttonAbl = true
+          }
+          if (disNum === this.multipleSelection.length) {
+            this.buttonMan.buttonDis = false
+          } else {
+            this.buttonMan.buttonDis = true
+          }
+          if (delNum === this.multipleSelection.length) {
+            this.buttonMan.buttonDel = false
+          } else {
+            this.buttonMan.buttonDel = true
+          }
+        }
         console.log('打印选择内容')
         console.log(this.multipleSelection)
       },
@@ -440,17 +480,17 @@
             if (that.ContableData[i].accountStatusId === 2) {
               console.log(that.ContableData[i].accountStatusId)
               console.log('修改表单')
-              that.ContableData[i].accountStatusId = ''
-              that.ContableData[i].createTime = ''
+              that.ContableData[i].accountStatusStr = ''
+              that.ContableData[i].createTimeStr = ''
               that.ContableData[i].name = ''
             }
             if (that.ContableData[i].accountStatusId === 1) {
-              that.ContableData[i].accountStatusId = '正常'
-              that.ContableData[i].createTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+              that.ContableData[i].accountStatusIdStr = '正常'
+              that.ContableData[i].createTimeStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
             }
             if (that.ContableData[i].accountStatusId === 0) {
-              that.ContableData[i].accountStatusId = '禁用'
-              that.ContableData[i].createTime = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+              that.ContableData[i].accountStatusIdStr = '禁用'
+              that.ContableData[i].createTimeStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
 //              that.isDisabled = '启用'
             }
           }

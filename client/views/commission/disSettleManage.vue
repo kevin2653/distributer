@@ -141,7 +141,7 @@
       <el-col :span="20"><div class="grid-content bg-purple"></div></el-col>
       <el-col :span="2">
         <div class="grid-content bg-purple">
-          <el-button round @click="isReInvoice">发票已到</el-button>
+          <el-button round :disabled="isReInvoiceButton" @click="isReInvoice">发票已到</el-button>
         </div>
       </el-col>
       <el-col :span="2">
@@ -168,9 +168,9 @@
             </el-table-column>
             <el-table-column label="转账金额(元)" prop="transferAmount" align="center">
             </el-table-column>
-            <el-table-column label="个人扣税金额" prop="taxAmount" align="center">
+            <el-table-column label="个人扣税金额" prop="taxAmountStr" align="center">
             </el-table-column>
-            <el-table-column label="发票是否收到" prop="isReceivedInvoice" align="center">
+            <el-table-column label="发票是否收到" prop="isReceivedInvoiceStr" align="center">
             </el-table-column>
             <el-table-column label="结算月份" prop="settlementYear" align="center">
             </el-table-column>
@@ -252,6 +252,7 @@
     },
     data () {
       return {
+        isReInvoiceButton: true,
         pageSizeArr: global.pageSizeArr,
         show: false,
         /** 弹框管理 */
@@ -492,10 +493,10 @@
               for (var k = 0; k < that.settleData.length; k++) {
                 if (that.multipleSelection[j].settlementId === that.settleData[k].settlementId) {
                   if (that.settleData[k].dInfo.bankAccountType === 0) {
-                    that.settleData[k].isReceivedInvoice = '---'
+                    that.settleData[k].isReceivedInvoiceStr = '---'
                   }
                   if (that.settleData[k].dInfo.bankAccountType === 1) {
-                    that.settleData[k].isReceivedInvoice = '是'
+                    that.settleData[k].isReceivedInvoiceStr = '是'
                   }
                 }
               }
@@ -508,6 +509,22 @@
       /** 多选框触发 */
       handleSelectionChange (val) {
         this.multipleSelection = val
+        var num = 0
+        if (this.multipleSelection.length === 0) {
+          this.isReInvoiceButton = true
+        }
+        if (this.multipleSelection.length > 0) {
+          for (var i = 0; i < this.multipleSelection.length; i++) {
+            if (this.multipleSelection[i].isReceivedInvoice === false || this.multipleSelection[i].isReceivedInvoiceStr !== '---') {
+              num++
+            }
+          }
+          if (num === this.multipleSelection.length) {
+            this.isReInvoiceButton = false
+          } else {
+            this.isReInvoiceButton = true
+          }
+        }
       },
       /** form表单提交 */
       onSubmit () {
@@ -560,16 +577,16 @@
               that.settleData[i].transferStatusId = '转账完成'
             }
             if (that.settleData[i].dInfo.bankAccountType === 0) {
-              that.settleData[i].taxAmount = that.settleData[i].taxAmount / 100
-              that.settleData[i].isReceivedInvoice = '---'
+              that.settleData[i].taxAmountStr = that.settleData[i].taxAmount / 100
+              that.settleData[i].isReceivedInvoiceStr = '---'
             }
             if (that.settleData[i].dInfo.bankAccountType === 1) {
-              that.settleData[i].taxAmount = '---'
+              that.settleData[i].taxAmountStr = '---'
               if (that.settleData[i].isReceivedInvoice === true) {
-                that.settleData[i].isReceivedInvoice = '是'
+                that.settleData[i].isReceivedInvoiceStr = '是'
               }
               if (that.settleData[i].isReceivedInvoice === false) {
-                that.settleData[i].isReceivedInvoice = '否'
+                that.settleData[i].isReceivedInvoiceStr = '否'
               }
             }
           }

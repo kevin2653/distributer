@@ -29,7 +29,7 @@ module.exports = {
         // https://qa-distributor.yuelvhui.com/
         // https://distributor.yuelvhui.com/api
         // http://dev.yuelvhui.com:8080/yuelvhui_distributer/
-        target: 'https://qa-distributor.yuelvhui.com/',
+        target: 'https://distributor.yuelvhui.com/api',
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/'

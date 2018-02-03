@@ -344,6 +344,8 @@
   }
   // 全局API
   const API = 'https://qa-api.yuelvhui.com/'
+  // 支付接口
+  const payApi = 'https://payment.yuelvhui.com/prepay'
   // 分页显示数组
   const pageSizeArr = [5, 7, 9, 11]
   // 判断是否为空
@@ -354,6 +356,14 @@
     }
     return flag
   }
+  // 护照类别
+  const passportType = [{
+    value: 1,
+    label: '会员本人护照'
+  }, {
+    value: 2,
+    label: '会员常旅客护照'
+  }]
   export default {
     titleOp, // 职业身份
     genderOp, // 性别
@@ -383,6 +393,8 @@
     API,
     pageSizeArr, // 全局分页数组
     isNull,  // 是否为空
-    passportOp // 护照
+    passportOp, // 护照
+    payApi,  // 支付接口
+    passportType // 护照类别
   }
 </script>

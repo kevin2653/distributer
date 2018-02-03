@@ -89,7 +89,8 @@
           <br>
           <div align="center" style="margin-right: 30rem">
             <el-form-item>
-            <el-button type="primary" @click="editCustomOrder">编  辑</el-button>
+            <el-button type="primary" @click="editCustomOrder" disabled v-if="Number(orderDetails.order_id) > 0">编  辑</el-button>
+              <el-button type="primary" @click="editCustomOrder" v-else>编  辑</el-button>
               <!--<el-button type="primary" @click="dialogM.settingPrice = true"></el-button>-->
               <el-button type="primary" @click="customOrderPay">支  付</el-button>
             </el-form-item>
@@ -110,17 +111,24 @@
             <label>成人: {{customOrderPayForm.adultStr}}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label>儿童: {{customOrderPayForm.childStr}}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label>老人: {{customOrderPayForm.oldStr}}</label><br>
-            <el-form-item label="总支付金额" prop="amountStr">
+            <el-form-item label="总支付金额" prop="amountStr" v-if="Number(orderDetails.orderId) === 0">
               <el-input style="width: 10rem" v-model.number="customOrderPayForm.amountStr"></el-input><label>元</label>
             </el-form-item>
-            <el-form-item>
-              <el-button type="primary" disabled v-if="customOrderPayForm.amountStr === ''" style="margin-left: 8rem">生成支付二维码</el-button>
-              <el-button type="primary" @click="makeCode" v-else style="margin-left: 8rem">生成支付二维码</el-button>
+            <el-form-item label="总支付金额" v-else>
+              {{payParams.orderFeeStr}}
             </el-form-item>
-            <div id="qrCode" style="width: 100%;height:20rem;text-align: center"></div>
+            <el-form-item v-if="Number(orderDetails.orderId) === 0">
+              <el-button type="primary" disabled v-if="customOrderPayForm.amountStr === ''" style="margin-left: 8rem">生成支付二维码</el-button>
+              <el-button type="primary" @click="getPayORcode" v-else style="margin-left: 8rem">生成支付二维码</el-button>
+            </el-form-item>
+            <div id="qrCode" style="width: 100%;height:20rem;" align="center">
+            </div>
+            <div  style="width: 100%;" align="center">
+              <span v-if="Number(orderDetails.orderId) > 0">截图发给客户，扫码支付</span>
+            </div>
           </el-form>
         </div>
-        <span slot="footer" class="dialog-footer" style="display: none">
+        <span slot="footer" class="dialog-footer" >
             <el-button type="primary" @click="dialogM.orderPayDialog = false">关 闭</el-button>
           </span>
       </el-dialog>
@@ -268,24 +276,53 @@
         this.lineOrder = JSON.parse(this.$route.query.lineOrder)
       }
       this.orderDetails = JSON.parse(this.$route.query.customDetails)
+      console.log(this.orderDetails)
+//      this.orderDetails.order_id = 0
+//      if (Number(this.orderDetails.order_id) > 0) {
+//        this.getPayParam()
+//      }
       this.orderDataGet(this.orderDetails)
-      this.getPayParam()
     },
     mounted: function () {},
-    updated: function () {},
+    updated: function () {
+      if (!this.dialogM.orderPayDialog) {
+        document.getElementById('qrCode').innerHTML = ''
+      }
+    },
     methods: {
+      // 调用支付接口
+      getPayApiMethod (prepayBody) {
+        var that = this
+        var BODY = {
+          prepayBody,
+          tradeType: 'WX_NATIVE',
+          sysSource: 'distributor'
+        }
+        axios.post(global.payApi, BODY, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Sys ' + global.getCookie('authorization')
+          }
+        }).then(function (response) {
+          console.log('打印支付接口返回数据')
+          console.log(response.data)
+          that.makeCode(response.data.getwayUrl)
+        }).catch(function (error) {
+          console.log(error)
+        })
+      },
       // 生成二维码
-      makeCode () {
-        var text = 'weixin://wxpay/bizpayurl?sign=' + this.payParams.sign + '&appid=' + this.payParams.mchId + '&mch_id=' + this.payParams.mchId + '&product_id=' + this.payParams.productId + '&time_stamp=' + this.payParams.expireTime.toString().substring(0, 10) + '&nonce_str=' + this.payParams.sign
+      makeCode (text) {
+//        var text = 'weixin://wxpay/bizpayurl?sign=' + this.payParams.sign + '&appid=' + this.payParams.mchId + '&mch_id=' + this.payParams.mchId + '&product_id=' + this.payParams.productId + '&time_stamp=' + this.payParams.expireTime.toString().substring(0, 10) + '&nonce_str=' + this.payParams.sign
         console.log(text)
         var qrCode = new QRCode('qrCode', {
-          text: text,
+          text: '',
           width: 300,
           height: 300,
           colorDark: '#000000',
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.H})
-        qrCode.makeCode()
+        qrCode.makeCode(text)
       },
       // 点击下单
       getPayORcode () {
@@ -302,6 +339,11 @@
         }).then(function (response) {
           console.log('打印二维码返回的数据')
           console.log(response.data)
+          if (response.data.orderId > 0) {
+            that.orderDetails.orderId = response.data.orderId
+            that.payParams.orderFeeStr = response.data.payParameter.orderFee / 100 + '.00'
+            that.getPayApiMethod(response.data.payParameter)
+          }
         }).catch(function (error) {
           console.log(error)
         })
@@ -317,7 +359,9 @@
         }).then(function (response) {
           console.log('打印定制订单支付参数')
           console.log(response.data)
+          that.getPayApiMethod(response.data)
           that.payParams = response.data
+          that.payParams.orderFeeStr = that.payParams.orderFee / 100 + '.00'
 //          that.makeCode()
         }).catch(function (error) {
           console.log(error)
@@ -349,6 +393,9 @@
         this.customOrderPayForm.oldStr = '无'
         if (global.isNull(this.orderDetails.tourers.subNum.old)) {
           this.customOrderPayForm.oldStr = this.orderDetails.tourers.subNum.old + '人'
+        }
+        if (Number(this.orderDetails.orderId) > 0) {
+          this.getPayParam()
         }
       },
       /** 进入界面即加载 */

@@ -167,11 +167,12 @@
     </el-form>
     <hr>
     <el-row :gutter="20">
-      <el-col :span="2">
-        <div class="grid-content bg-purple">
-          <el-button round @click="orderAddMeth">订单录入</el-button>
-        </div>
-      </el-col>
+      <!--暂时取消-->
+      <!--<el-col :span="2">-->
+        <!--<div class="grid-content bg-purple">-->
+          <!--<el-button round @click="orderAddMeth">订单录入</el-button>-->
+        <!--</div>-->
+      <!--</el-col>-->
       <el-col :span="2">
         <div class="grid-content bg-purple">
           <el-button round :disabled="buttonM.orderClaim" @click="orderClaimMeth">订单认领</el-button>
@@ -190,17 +191,17 @@
       </el-col>
       <el-col :span="2">
         <div class="grid-content bg-purple">
-          <el-button round @click="batchConfirmed" :disabled="buttonM.alConfirm">已确认</el-button>
+          <el-button round @click="updateOrderStatua(111)" :disabled="buttonM.alConfirm">已确认</el-button>
         </div>
       </el-col>
       <el-col :span="2">
         <div class="grid-content bg-purple">
-          <el-button round @click="batchLeave" :disabled="buttonM.alStart">已出发</el-button>
+          <el-button round @click="updateOrderStatua(115)" :disabled="buttonM.alStart">已出发</el-button>
         </div>
       </el-col>
       <el-col :span="2">
         <div class="grid-content bg-purple">
-          <el-button round  @click="batchFinish" :disabled="buttonM.alFinish" >已完成</el-button>
+          <el-button round  @click="updateOrderStatua(200)" :disabled="buttonM.alFinish" >已完成</el-button>
         </div>
       </el-col>
       <el-col :span="1"><div class="grid-content bg-purple"></div></el-col>
@@ -234,8 +235,8 @@
             <el-table-column align="center" width="340" label="操作">
               <template slot-scope="scope" center>
                 <el-button round size="mini" @click="seeDetails(scope.$index, scope.row)">查看详情</el-button>
-                <el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" v-if="scope.row.statusId === 101&& scope.row.statusId === 102&& scope.row.statusId === 111">取消订单</el-button>
-                <!--<el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" v-else>取消订单</el-button>-->
+                <!--<el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" v-if="scope.row.statusId === 101 && scope.row.statusId === 102 && scope.row.statusId === 111">取消订单</el-button>-->
+                <el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" v-if="scope.row.statusId < 115">取消订单</el-button>
                 <el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" disabled v-if="scope.row.statusId === 201">已取消</el-button>
                 <!--<el-button round size="mini" @click="cancelOrder(scope.$index, scope.row)" v-else>已取消</el-button>-->
                 <el-button round size="mini" @click="payOrder(scope.$index, scope.row)" v-if="scope.row.statusId === 101">支付订单</el-button>
@@ -305,15 +306,17 @@
       <el-dialog title="订单支付" :visible.sync="dialogM.orderPayDialog" width="30%" :modal-append-to-body="false" center>
         <div style="margin-left: 5rem">
           <el-form :model="orderPayForm" class="demo-form-inline">
-            <label>联系人姓名:</label><br>
-            <label>联系人电话:</label><br>
-            <label>团号:</label><br>
-            <label>单价(成人):</label><br>
-            <label>成人:</label><br>
-            <label>单价(儿童):</label><br>
-            <label>儿童:</label><br>
-            <label>支付总金额:</label><br>
+            <label>联系人姓名: {{orderPayForm.linkMan}}</label><br>
+            <label>联系人电话: {{orderPayForm.linkTel}}</label><br>
+            <label>团号: {{orderPayForm.tourGroup}}</label><br>
+            <label>单价(成人): {{orderPayForm.adultAmount}}</label><br>
+            <label>成人: {{orderPayForm.adultNum}}</label><br>
+            <label>单价(儿童): {{orderPayForm.childAmount}}</label><br>
+            <label>儿童: {{orderPayForm.childNum}}</label><br>
+            <label>支付总金额: {{orderPayForm.amountStr}}</label><br>
           </el-form>
+        </div>
+        <div id="qrCode" style="width: 100%;height:20rem;" align="center">
         </div>
         <span slot="footer" class="dialog-footer">
             <el-button type="primary" @click="dialogM.orderPayDialog = false">确 定</el-button>
@@ -339,6 +342,7 @@
 <script>
   import axios from 'axios'
   import global from '../../global'
+  import QRCode from 'qrcodejs2'
   export default {
     components: {
       axios,
@@ -382,7 +386,7 @@
           label: '待确认'
         }, {
           value: 111,
-          label: '待出发'
+          label: '已确认'
         }, {
           value: 115,
           label: '已出发'
@@ -464,29 +468,104 @@
       this.dataGet()
     },
     updated: function () {
+      if (this.dialogM.orderPayDialog) {
+//        console.log(typeof document.getElementById('qrCode').innerHTML)
+        document.getElementById('qrCode').innerHTML = ''
+      }
     },
     methods: {
       /** 分页 */
       handleSizeChange (val) {
         this.lineOrder.pageSize = val
-        console.log('当前数量')
-        console.log(this.lineOrder.pageSize)
+//        console.log('当前数量')
+//        console.log(this.lineOrder.pageSize)
         this.onSubmit()
-        console.log(`每页 ${val} 条`)
+//        console.log(`每页 ${val} 条`)
       },
       handleCurrentChange (val) {
         this.lineOrder.pageIndex = val
         this.onSubmit()
-        console.log(`当前页: ${val}`)
+//        console.log(`当前页: ${val}`)
       },
       /** 支付订单按钮 */
       payOrder (index, row) {
-        this.dialogM.orderPayDialog = true
         this.orderPayForm.ordersn = row.ordersn
-        this.orderPayForm.payAmount = row.payAmount
-        this.orderPayForm.pid = row.pid
-        this.orderPayForm.pName = row.pName
+        this.orderPayForm.linkMan = row.linkMan
+        this.orderPayForm.linkTel = row.linkTel
+        this.orderPayForm.amountStr = row.amount / 100 + '.00元'
+        this.orderPayForm.tourGroup = row.tourGroup
+        this.getOrderDetails(row.ordersn)
+        this.getPayParam(row.ordersn)
 //        this.timeMsg()
+      },
+      /** 获取当前支付订单详情 */
+      getOrderDetails (ordersn) {
+        var that = this
+        axios.get(global.API + '/distrbuter/admin/order/detail/' + ordersn, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Sys ' + global.getCookie('authorization')
+          }
+        }).then(function (response) {
+//          console.log('进入支付详情')
+//          console.log(response.data)
+          that.orderPayForm.adultNum = response.data.tourers.subNum.adult
+          that.orderPayForm.childNum = response.data.tourers.subNum.child
+          that.orderPayForm.oldNum = response.data.tourers.subNum.old
+          that.orderPayForm.adultAmount = response.data.amountDetail.adultprice.subAmount
+          that.orderPayForm.childAmount = response.data.amountDetail.childprice.subAmount
+          that.orderPayForm.oldAmount = response.data.amountDetail.oldprice.subAmount
+          that.dialogM.orderPayDialog = true
+//          console.log(that.orderPayForm)
+        }).catch(function (error) {
+          console.log(error)
+        })
+      },
+      // 获取定制订单支付参数接口
+      getPayParam (ordersn) {
+        var that = this
+        axios.get(global.API + 'distrbuter/admin/order/getPaymentCode/' + ordersn, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Sys ' + global.getCookie('authorization')
+          }
+        }).then(function (response) {
+          that.getPayApiMethod(response.data)
+        }).catch(function (error) {
+          console.log(error)
+        })
+      },
+      // 调用支付接口
+      getPayApiMethod (prepayBody) {
+        var that = this
+        var BODY = {
+          prepayBody,
+          tradeType: 'WX_NATIVE',
+          sysSource: 'distributor'
+        }
+        axios.post(global.payApi, BODY, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Sys ' + global.getCookie('authorization')
+          }
+        }).then(function (response) {
+          that.makeCode(response.data.getwayUrl)
+        }).catch(function (error) {
+          console.log(error)
+        })
+      },
+      // 生成二维码
+      makeCode (text) {
+//        var text = 'weixin://wxpay/bizpayurl?sign=' + this.payParams.sign + '&appid=' + this.payParams.mchId + '&mch_id=' + this.payParams.mchId + '&product_id=' + this.payParams.productId + '&time_stamp=' + this.payParams.expireTime.toString().substring(0, 10) + '&nonce_str=' + this.payParams.sign
+//        console.log(text)
+        var qrCode = new QRCode('qrCode', {
+          text: '',
+          width: 300,
+          height: 300,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H})
+        qrCode.makeCode(text)
       },
       /** 定时执行函数 */
       timeMsg () {
@@ -499,7 +578,7 @@
         console.log('执行定时任务结束')
       },
       /** 订单批量操作 */
-      updateOrderStatua () {
+      updateOrderStatua (value) {
         var ordersn = []
         var that = this
         for (var i = 0; i < that.multipleSelection.length; i++) {
@@ -508,7 +587,7 @@
         console.log(ordersn)
         var BODY = {
           ordersns: ordersn,
-          statusId: that.statusId
+          statusId: value
         }
         axios.post(global.API + 'distrbuter/admin/order/updateStatus', BODY, {
           headers: {
@@ -518,50 +597,63 @@
         }).then(function (response) {
           console.log('批量操作成功')
           console.log(response.data.code)
-          return response.data.code
+//          return response.data.code
+          if (response.data.code === 'SUCCESS') {
+            for (var i = 0; i < BODY.ordersns.length; i++) {
+              for (var j = 0; j < that.orderData.length; j++) {
+                if (BODY.ordersns[i] === that.orderData[j].ordersn) {
+                  for (var k = 0; k < global.orderStandStatus.length; k++) {
+                    if (value === global.orderStandStatus[k].value) {
+                      that.orderData[j].statusStr = global.orderStandStatus[k].label
+                    }
+                  }
+                }
+              }
+            }
+          }
         }).catch(function (error) {
           console.log(error)
         })
       },
       /** 批量已确认 */
-      batchConfirmed () {
-        this.statusId = 111
-        this.updateOrderStatua()
-        for (var i = 0; i < this.multipleSelection.length; i++) {
-          for (var j = 0; j < this.orderData.length; j++) {
-            if (this.multipleSelection[i].ordersn === this.orderData[j].ordersn) {
-              this.orderData[j].statusStr = '已确认'
-            }
-          }
-        }
-      },
+//      batchConfirmed () {
+//        this.statusId = 111
+//        this.updateOrderStatua()
+//        for (var i = 0; i < this.multipleSelection.length; i++) {
+//          for (var j = 0; j < this.orderData.length; j++) {
+//            if (this.multipleSelection[i].ordersn === this.orderData[j].ordersn) {
+//              this.orderData[j].statusStr = '已确认'
+//            }
+//          }
+//        }
+//      },
       /** 批量已出发 */
-      batchLeave () {
-        this.statusId = 115
-        this.updateOrderStatua()
-        for (var i = 0; i < this.multipleSelection.length; i++) {
-          for (var j = 0; j < this.orderData.length; j++) {
-            if (this.multipleSelection[i].ordersn === this.orderData[j].ordersn) {
-              this.orderData[j].statusStr = '已出发'
-            }
-          }
-        }
-      },
+//      batchLeave () {
+//        this.statusId = 115
+//        this.updateOrderStatua()
+//        for (var i = 0; i < this.multipleSelection.length; i++) {
+//          for (var j = 0; j < this.orderData.length; j++) {
+//            if (this.multipleSelection[i].ordersn === this.orderData[j].ordersn) {
+//              this.orderData[j].statusStr = '已出发'
+//            }
+//          }
+//        }
+//      },
       /** 批量已完成 */
-      batchFinish () {
-        this.statusId = 200
-        this.updateOrderStatua()
-        for (var i = 0; i < this.multipleSelection.length; i++) {
-          for (var j = 0; j < this.orderData.length; j++) {
-            if (this.multipleSelection[i].ordersn === this.orderData[j].ordersn) {
-              this.orderData[j].statusStr = '完成'
-            }
-          }
-        }
-      },
+//      batchFinish () {
+//        this.statusId = 200
+//        this.updateOrderStatua()
+//        for (var i = 0; i < this.multipleSelection.length; i++) {
+//          for (var j = 0; j < this.orderData.length; j++) {
+//            if (this.multipleSelection[i].ordersn === this.orderData[j].ordersn) {
+//              this.orderData[j].statusStr = '完成'
+//            }
+//          }
+//        }
+//      },
       /** 查看详情 */
       seeDetails (index, row) {
-        this.$router.push({path: '/line/lineStandOrder/lineStandDetails', query: {ordersn: row.ordersn, lineOrder: JSON.stringify(this.lineOrder)}})
+        this.$router.push({path: '/line/lineStandOrder/lineStandDetails', query: {ordersn: row.ordersn, lineOrder: JSON.stringify(this.lineOrder), sign: 'stand'}})
         console.log(row)
       },
       /** 取消订单 */
@@ -597,6 +689,15 @@
         }).then(function (response) {
           console.log('开始取消订单')
           console.log(response.data)
+          if (response.data.code === 'SUCCESS') {
+            for (var i = 0; i < that.orderData.length; i++) {
+//              console.log(BODY.ordersn)
+              if (BODY.ordersn === that.orderData[i].ordersn) {
+                that.orderData[i].statusStr = '待审核'
+                that.orderData[i].statusId = 201
+              }
+            }
+          }
         }).catch(function (error) {
           console.log(error)
         })
@@ -665,7 +766,11 @@
       /** 多选框触发 */
       handleSelectionChange (val) {
         var that = this
+        var alConfirmNum = 0
+        var alStartNum = 0
+        var alFinishNum = 0
         that.multipleSelection = val
+        console.log(that.multipleSelection)
         if (that.multipleSelection.length < 1) {
           that.buttonM.orderClaim = true
           that.buttonM.orderGroup = true
@@ -677,16 +782,50 @@
           that.buttonM.orderClaim = false
           that.buttonM.orderGroup = false
           that.buttonM.orderAdd = false
-          that.buttonM.alConfirm = false
-          that.buttonM.alStart = false
-          that.buttonM.alFinish = false
+          for (var i = 0; i < that.multipleSelection.length; i++) {
+            if (that.multipleSelection[i].statusId === 102) {
+              alConfirmNum++
+            }
+            if (that.multipleSelection[i].statusId === 111) {
+              alStartNum++
+            }
+            if (that.multipleSelection[i].statusId === 115) {
+              alFinishNum++
+            }
+          }
+          if (alConfirmNum === that.multipleSelection.length) {
+            that.buttonM.alConfirm = false
+          }
+          if (alStartNum === that.multipleSelection.length) {
+            that.buttonM.alStart = false
+          }
+          if (alFinishNum === that.multipleSelection.length) {
+            that.buttonM.alFinish = false
+          }
         } else {
           that.buttonM.orderClaim = true
           that.buttonM.orderGroup = true
           that.buttonM.orderAdd = true
-          that.buttonM.alConfirm = false
-          that.buttonM.alStart = false
-          that.buttonM.alFinish = false
+          for (var j = 0; j < that.multipleSelection.length; j++) {
+            if (that.multipleSelection[j].statusId === 102) {
+              alConfirmNum++
+            }
+            if (that.multipleSelection[j].statusId === 111) {
+              alStartNum++
+            }
+            if (that.multipleSelection[j].statusId === 115) {
+              alFinishNum++
+            }
+          }
+          if (alConfirmNum === that.multipleSelection.length) {
+            that.buttonM.alConfirm = false
+          }
+          if (alStartNum === that.multipleSelection.length) {
+            that.buttonM.alStart = false
+          }
+          if (alFinishNum === that.multipleSelection.length) {
+            that.buttonM.alFinish = false
+          }
         }
       },
       /** form表单提交 */
@@ -716,6 +855,7 @@
           that.orderData = response.data.orderList
           that.totalNum = response.data.totalNum
           for (var i = 0; i < that.orderData.length; i++) {
+//            that.orderData[i].statusId = 102
             that.orderData[i].amountStr = (that.orderData[i].amount) / 100
             for (var j = 0; j < that.tableData.length; j++) {
               if (that.orderData[i].distributerId === that.tableData[j].distributerId) {
@@ -729,8 +869,8 @@
               }
             }
           }
-          console.log(that.orderData)
-          console.log('查询表单结束')
+//          console.log(that.orderData)
+//          console.log('查询表单结束')
         }).catch(function (error) {
           console.log(error)
         })
