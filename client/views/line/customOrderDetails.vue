@@ -43,7 +43,7 @@
               {{orderDetails.dayNum}}
             </el-form-item>
             <el-form-item label="临时团号:">
-              {{orderDetails.team_id}}
+              {{orderDetails.teamId}}
             </el-form-item>
             <el-form-item label="出行人数:">
               <!--+ orderDetails.tourers.subNum.old-->
@@ -89,7 +89,7 @@
           <br>
           <div align="center" style="margin-right: 30rem">
             <el-form-item>
-            <el-button type="primary" @click="editCustomOrder" disabled v-if="Number(orderDetails.order_id) > 0">编  辑</el-button>
+            <el-button type="primary" @click="editCustomOrder" disabled v-if="Number(orderDetails.orderId) > 0">编  辑</el-button>
               <el-button type="primary" @click="editCustomOrder" v-else>编  辑</el-button>
               <!--<el-button type="primary" @click="dialogM.settingPrice = true"></el-button>-->
               <el-button type="primary" @click="customOrderPay">支  付</el-button>
@@ -104,7 +104,7 @@
       <el-dialog title="订单支付" :visible.sync="dialogM.orderPayDialog" width="30%" :modal-append-to-body="false" center>
         <div style="margin-left: 5rem">
           <el-form class="demo-form-inline" :model="customOrderPayForm" :rules="rules" ref="customOrderPayForm">
-            <label>团号: {{customOrderPayForm.team_id}}</label><br>
+            <label>团号: {{customOrderPayForm.teamId}}</label><br>
             <label>订单编号: {{customOrderPayForm.requirementId}}</label><br>
             <label>联系人: {{customOrderPayForm.linkMan}}</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label>电话: {{customOrderPayForm.linkTel}}</label><br>
@@ -123,6 +123,7 @@
             </el-form-item>
             <div id="qrCode" style="width: 100%;height:20rem;" align="center">
             </div>
+            <br>
             <div  style="width: 100%;" align="center">
               <span v-if="Number(orderDetails.orderId) > 0">截图发给客户，扫码支付</span>
             </div>
@@ -276,7 +277,7 @@
         this.lineOrder = JSON.parse(this.$route.query.lineOrder)
       }
       this.orderDetails = JSON.parse(this.$route.query.customDetails)
-      console.log(this.orderDetails)
+//      console.log(this.orderDetails)
 //      this.orderDetails.order_id = 0
 //      if (Number(this.orderDetails.order_id) > 0) {
 //        this.getPayParam()
@@ -304,8 +305,8 @@
             'Authorization': 'Sys ' + global.getCookie('authorization')
           }
         }).then(function (response) {
-          console.log('打印支付接口返回数据')
-          console.log(response.data)
+//          console.log('打印支付接口返回数据')
+//          console.log(response.data)
           that.makeCode(response.data.getwayUrl)
         }).catch(function (error) {
           console.log(error)
@@ -314,7 +315,7 @@
       // 生成二维码
       makeCode (text) {
 //        var text = 'weixin://wxpay/bizpayurl?sign=' + this.payParams.sign + '&appid=' + this.payParams.mchId + '&mch_id=' + this.payParams.mchId + '&product_id=' + this.payParams.productId + '&time_stamp=' + this.payParams.expireTime.toString().substring(0, 10) + '&nonce_str=' + this.payParams.sign
-        console.log(text)
+//        console.log(text)
         var qrCode = new QRCode('qrCode', {
           text: '',
           width: 300,
@@ -337,8 +338,8 @@
             'Authorization': 'Sys ' + global.getCookie('authorization')
           }
         }).then(function (response) {
-          console.log('打印二维码返回的数据')
-          console.log(response.data)
+//          console.log('打印二维码返回的数据')
+//          console.log(response.data)
           if (response.data.orderId > 0) {
             that.orderDetails.orderId = response.data.orderId
             that.payParams.orderFeeStr = response.data.payParameter.orderFee / 100 + '.00'
@@ -357,8 +358,8 @@
             'Authorization': 'Sys ' + global.getCookie('authorization')
           }
         }).then(function (response) {
-          console.log('打印定制订单支付参数')
-          console.log(response.data)
+//          console.log('打印定制订单支付参数')
+//          console.log(response.data)
           that.getPayApiMethod(response.data)
           that.payParams = response.data
           that.payParams.orderFeeStr = that.payParams.orderFee / 100 + '.00'
@@ -379,7 +380,7 @@
       customOrderPay () {
         this.dialogM.orderPayDialog = true
         this.customOrderPayForm.requirementId = this.orderDetails.requirementId // 订单号
-        this.customOrderPayForm.team_id = this.orderDetails.team_id // 团号
+        this.customOrderPayForm.teamId = this.orderDetails.teamId // 团号
         this.customOrderPayForm.linkMan = this.orderDetails.linkMan // 联系人
         this.customOrderPayForm.linkTel = this.orderDetails.linkTel // 联系电话
         this.customOrderPayForm.childStr = '无'
@@ -409,12 +410,12 @@
         orderDetails.planeClaim = ''
         // 机票要求
         for (var i = 0; i < this.selectM.cabinOp.length; i++) {
-          if (Number(this.selectM.cabinOp[i].value) === orderDetails.planeTicket.ShippingSpace) {
+          if (Number(this.selectM.cabinOp[i].value) === Number(orderDetails.planeTicket.ShippingSpace)) {
             orderDetails.planeClaim = orderDetails.planeClaim + this.selectM.cabinOp[i].label
           }
         }
         for (var m = 0; m < this.selectM.modelOp.length; m++) {
-          if (Number(this.selectM.modelOp[m].value) === orderDetails.planeTicket.type) {
+          if (Number(this.selectM.modelOp[m].value) === Number(orderDetails.planeTicket.type)) {
             orderDetails.planeClaim = orderDetails.planeClaim + '/' + this.selectM.modelOp[m].label
           }
         }
@@ -424,17 +425,17 @@
         // 酒店要求
         orderDetails.hotelClaim = ''
         for (var j = 0; j < this.selectM.hotelStarOp.length; j++) {
-          if (Number(this.selectM.hotelStarOp[j].value) === orderDetails.hotel.stars) {
+          if (Number(this.selectM.hotelStarOp[j].value) === Number(orderDetails.hotel.stars)) {
             orderDetails.hotelClaim = orderDetails.hotelClaim + this.selectM.hotelStarOp[j].label
           }
         }
         for (var l = 0; l < this.selectM.hotelRoomStandOp.length; l++) {
-          if (Number(this.selectM.hotelRoomStandOp[l].value) === orderDetails.hotel.roomStandard) {
+          if (Number(this.selectM.hotelRoomStandOp[l].value) === Number(orderDetails.hotel.roomStandard)) {
             orderDetails.hotelClaim = orderDetails.hotelClaim + '/' + this.selectM.hotelRoomStandOp[l].label
           }
         }
         for (var k = 0; k < this.selectM.hotelTypeOp.length; k++) {
-          if (Number(this.selectM.hotelTypeOp[k].value) === orderDetails.hotel.type) {
+          if (Number(this.selectM.hotelTypeOp[k].value) === Number(orderDetails.hotel.type)) {
             orderDetails.hotelClaim = orderDetails.hotelClaim + '/' + this.selectM.hotelTypeOp[k].label
           }
         }
@@ -443,12 +444,14 @@
         }
         // 车辆要求
         orderDetails.carClaim = ''
-        orderDetails.carClaim = orderDetails.cars.sites + '座'
+        if (Number(orderDetails.cars.sites) > 0) {
+          orderDetails.carClaim = orderDetails.cars.sites + '座'
+        }
         if (orderDetails.cars.appoint !== null) {
           orderDetails.carClaim = orderDetails.carClaim + orderDetails.cars.appoint
         }
         for (var n = 0; n < this.selectM.carStandOp.length; n++) {
-          if (Number(this.selectM.carStandOp[n].value) === orderDetails.cars.type) {
+          if (Number(this.selectM.carStandOp[n].value) === Number(orderDetails.cars.type)) {
             orderDetails.carClaim = orderDetails.carClaim + '/' + this.selectM.carStandOp[n].label
           }
         }
@@ -456,26 +459,36 @@
           orderDetails.carClaim = orderDetails.carClaim + '/' + orderDetails.cars.appoint
         }
         // 餐食要求
-        orderDetails.foodClaim = orderDetails.food.courses + '菜/' + orderDetails.food.soups + '汤/' + orderDetails.food.characteristic + '次特色餐'
+        orderDetails.foodClaim = ''
+        if (Number(orderDetails.food.courses) > 0) {
+          orderDetails.foodClaim = orderDetails.foodClaim + orderDetails.food.courses + '菜/'
+        }
+        if (Number(orderDetails.food.soups) > 0) {
+          orderDetails.foodClaim = orderDetails.foodClaim + orderDetails.food.soups + '汤/'
+        }
+        if (Number(orderDetails.food.characteristic) > 0) {
+          orderDetails.foodClaim = orderDetails.foodClaim + orderDetails.food.characteristic + '次特色餐'
+        }
+//        orderDetails.foodClaim = orderDetails.food.courses + '菜/' + orderDetails.food.soups + '汤/' + orderDetails.food.characteristic + '次特色餐'
         if (orderDetails.food.appoint !== null) {
           orderDetails.foodClaim = orderDetails.foodClaim + '/' + orderDetails.food.appoint
         }
         // 邀请函
         orderDetails.InvitationCard = ''
         for (var q = 0; q < this.selectM.invitationOp.length; q++) {
-          if (Number(this.selectM.invitationOp[q].value) === orderDetails.activity.InvitationType) {
+          if (Number(this.selectM.invitationOp[q].value) === Number(orderDetails.activity.InvitationType)) {
             orderDetails.InvitationCard = this.selectM.invitationOp[q].label
           }
         }
         // 签证要求
         orderDetails.visaClaim = ''
         for (var w = 0; w < this.selectM.visaReasionOp.length; w++) {
-          if (Number(this.selectM.visaReasionOp[w].value) === orderDetails.visa.reason) {
+          if (Number(this.selectM.visaReasionOp[w].value) === Number(orderDetails.visa.reason)) {
             orderDetails.visaClaim = orderDetails.visaClaim + this.selectM.visaReasionOp[w].label
           }
         }
         for (var r = 0; r < this.selectM.visaTypeOp.length; r++) {
-          if (Number(this.selectM.visaTypeOp[r].value) === orderDetails.visa.type) {
+          if (Number(this.selectM.visaTypeOp[r].value) === Number(orderDetails.visa.type)) {
             orderDetails.visaClaim = orderDetails.visaClaim + '/' + this.selectM.visaTypeOp[r].label
           }
         }

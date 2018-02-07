@@ -11,7 +11,7 @@
                          :before-close="handleClose" center class="modelStyle">
                 <el-container>
                   <el-aside width="50%">
-                    <el-input v-model="proName" @change="inputChangePro" placeholder="输入线路名称或产品编号"></el-input>
+                    <el-input v-model="proName" @input="inputChangePro" placeholder="输入线路名称或产品编号"></el-input>
                     <el-table :data="lineData" border @row-click="rowClickProduct" height="250" style="width: 100%">
                       <el-table-column prop="pName">
                       </el-table-column>
@@ -27,12 +27,12 @@
                       <label>产品名称：<br>
                         {{productData.pName}}<br>
                       </label>
-                      <label>出行时间：<br>
-                        2017-12-25<br>
-                      </label>
-                      <label>产品价格：<br>
-                        5000
-                      </label>
+                      <!--<label>出行时间：<br>-->
+                        <!--{{}}<br>-->
+                      <!--</label>-->
+                      <!--<label>产品价格：<br>-->
+                        <!--{{}}-->
+                      <!--</label>-->
                     </div>
                   </el-main>
                 </el-container>
@@ -149,9 +149,9 @@
             </el-table-column>
             <el-table-column label="退款状态" prop="statusStr" align="center">
             </el-table-column>
-            <el-table-column label="订单取消时间" prop="cancelTime" align="center">
+            <el-table-column label="订单取消时间" prop="cancelTimeStr" align="center">
             </el-table-column>
-            <el-table-column label="退款时间" prop="refundTime" align="center">
+            <el-table-column label="退款时间" prop="refundTimeStr" align="center">
             </el-table-column>
             <el-table-column label="代理商名称" prop="distributerName" align="center">
             </el-table-column>
@@ -159,7 +159,7 @@
             </el-table-column>
             <el-table-column align="center" width="240" label="操作">
               <template slot-scope="scope" center>
-                <el-button round size="mini" @click="orderAudit(scope.$index, scope.row)">审  核</el-button>
+                <el-button round size="mini" @click="orderAudit(scope.$index, scope.row)" v-if="scope.row.statusId === 201">审  核</el-button>
                 <el-button round size="mini" @click="seeDetails(scope.$index, scope.row)">查看订单</el-button>
               </template>
             </el-table-column>
@@ -326,17 +326,25 @@
       /** 退款金额设置 */
       orderAuditSubmit () {
         var that = this
-        console.log((Number(this.orderAuditForm.refundAmountStr) * 100))
-        axios.get(global.API + 'distrbuter/admin/order/refund/' + this.orderAuditForm.ordersn + '/' + (Number(this.orderAuditForm.refundAmountStr) * 100), {
+//        console.log((Number(this.orderAuditForm.refundAmountStr) * 100))
+        axios.get(global.API + 'distrbuter/admin/order/refund/' + that.orderAuditForm.ordersn + '/' + (Number(this.orderAuditForm.refundAmountStr) * 100), {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
-          console.log(response.data)
+//          console.log(response.data)
           if (response.data.code === 'SUCCESS') {
             that.dialogM.orderAuditDialog = false
             that.orderAuditForm.refundAmountStr = ''
+            that.onSubmit()
+//            for (var i = 0; i < that.orderData.length; i++) {
+//              if (that.orderAuditForm.ordersn === that.orderData[i].ordersn) {
+//                for (var j = 0; j < global.orderStandStatus.length; j++) {
+//                  if () {}
+//                }
+//              }
+//            }
           }
         }).catch(function (error) {
           console.log(error)
@@ -379,6 +387,17 @@
                 that.orderData[i].operatorName = that.managerOp[k].managerName
               }
             }
+            if (that.orderData[i].refundTime === 0) {
+              that.orderData[i].refundTimeStr = ''
+            }
+            if (that.orderData[i].cancelTime === 0) {
+              that.orderData[i].cancelTimeStr = ''
+            }
+//            console.log(that.orderData[i].cancelTime)
+//            console.log(new Date().getTime())
+            if (typeof that.orderData[i].cancelTime === 'number') {
+              that.orderData[i].cancelTimeStr = global.changeFormat(that.orderData[i].cancelTime)
+            }
           }
 //          console.log(that.orderData)
 //          console.log('查询表单结束')
@@ -391,19 +410,19 @@
         this.lineOrder.distributerId = ''
         this.lineOrder.tourGroup = ''
         this.lineOrder.operatorId = ''
-        this.lineOrder.isBeenManage = ''
-        this.lineOrder.addTime = ''
+        this.lineOrder.cancelStatus = ''
+        this.lineOrder.pid = ''
         this.selectDistributer = '选择代理商'
-        this.lineOrder.currentPage = 1
+        this.lineOrder.pageIndex = 1
         this.lineOrder.pageSize = 5
-        this.distributerData = [{}]
+        this.distributerData = []
         this.productData = {}
         this.selectProduct = '选择产品'
         this.orderData = []
         this.managerData = {}
         this.disName = ''
         this.totalNum = 0
-        console.log(this.lineOrder)
+//        console.log(this.lineOrder)
       },
       /** 多选框触发 */
 //      handleSelectionChange (val) {
@@ -453,15 +472,20 @@
         that.lineOrder.distributerId = row.distributerId
       },
       /** input改变，查询产品 */
-      inputChangePro () {
+      inputChangePro (value) {
         var that = this
-        for (var i = 0; i < that.lineData.length; i++) {
-          if (that.lineData[i].pName.indexOf(that.proName) > -1) {
-            that.lineLikeData.push(that.lineData[i])
-          }
-        }
-        console.log(that.lineLikeData)
-        that.lineData = that.lineLikeData
+        setTimeout(function () {
+          axios.get(global.API + 'distrbuter/product/list/1/' + value, {
+            headers: {
+              'Authorization': 'Sys ' + global.getCookie('authorization'),
+              'Content-Type': 'application/json'
+            }
+          }).then(function (response) {
+            that.lineData = response.data
+          }).catch(function (error) {
+            console.log(error)
+          })
+        }, 300)
       },
       /** 选择产品显示详情 */
       rowClickProduct (row) {
@@ -495,7 +519,7 @@
       /** 获取线路产品 */
       proData () {
         var that = this
-        axios.get(global.API + "distrbuter/product/list/100/''", {
+        axios.get(global.API + 'distrbuter/product/list/1', {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'

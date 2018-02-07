@@ -122,7 +122,7 @@
           <el-table :data="orderData" tooltip-effect="dark" @selection-change="handleSelectionChange" border style="width: 100%" >
             <el-table-column type="selection" label="全选" width="55">
             </el-table-column>
-            <el-table-column label="订单编号" prop="requirementId" align="center">
+            <el-table-column label="订单编号" prop="ordersn" align="center">
             </el-table-column>
             <el-table-column label="目的地" prop="destination" align="center">
             </el-table-column>
@@ -130,7 +130,7 @@
             </el-table-column>
             <el-table-column label="联系电话" prop="linkTel" align="center">
             </el-table-column>
-            <el-table-column label="临时团号" prop="team_id" align="center">
+            <el-table-column label="临时团号" prop="teamId" align="center">
             </el-table-column>
             <el-table-column label="需求创建时间" prop="createTime" align="center">
             </el-table-column>
@@ -179,7 +179,7 @@
         <div style="margin-left: 5rem">
           <el-form :model="orderClaimForm" class="demo-form-inline">
             <el-form-item label="订单编号">{{orderClaimForm.ordersn}}</el-form-item>
-            <el-form-item label="需求目的地">美国</el-form-item>
+            <el-form-item label="需求目的地">{{orderClaimForm.destination}}</el-form-item>
             <el-form-item label="运营负责人">
               <el-select v-model="orderClaimForm.operationId" placeholder="请选择" style="width: 10rem">
                 <el-option
@@ -204,7 +204,7 @@
                  :before-close="handleClose" center class="modelStyle">
         <el-container>
           <el-aside width="50%">
-            <el-input v-model="proName" @change="inputChangePro" placeholder="输入线路名称或产品编号"></el-input>
+            <el-input v-model="proName" @input="inputChangePro" placeholder="输入线路名称或产品编号"></el-input>
             <el-table :data="lineData" border @row-click="rowClickProduct" height="250" style="width: 100%">
               <el-table-column prop="pName">
               </el-table-column>
@@ -312,6 +312,7 @@
         orderClaimForm: {
           ordersn: '',
          /** 目的地缺数据 */
+          destination: '',
           operationId: ''
         }
       }
@@ -353,8 +354,11 @@
       },
       /** 订单认领 */
       orderClaimMeth () {
+        this.orderClaimForm.requirementId = this.multipleSelection[0].requirementId
         this.orderClaimForm.ordersn = this.multipleSelection[0].ordersn
-//        for (var i = 0; i < this.orderData.length; i++) {
+        this.orderClaimForm.destination = this.multipleSelection[0].destination
+//        this.orderClaimForm.operationId = this.multipleSelection[0].operatorId
+//        for (var i = 0; i < this.orderData.length; i++) {operationId
 //          if (this.orderData[i].ordersn === this.orderClaimForm.ordersn) {
 //          }
 //        }
@@ -364,28 +368,30 @@
       orderClaimSubmit () {
         var that = this
         var BODY = {
-          ordersn: that.orderClaimForm.ordersn,
+          requirementId: that.orderClaimForm.requirementId,
           operatorId: that.orderClaimForm.operationId
         }
-        axios.post(global.API + 'distrbuter/admin/order/setOperationManager', BODY, {
+//        console.log(BODY)
+        axios.post(global.API + 'distrbuter/admin/customized/setOperationManager', BODY, {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
-          console.log('开始认领订单')
-          console.log(response.data)
+//          console.log('开始认领订单')
+//          console.log(response.data)
           if (response.data.code === 'SUCCESS') {
-            console.log(that.orderClaimForm.ordersn)
+//            console.log(that.orderClaimForm.ordersn)
             for (var i = 0; i < that.orderData.length; i++) {
-              console.log('开始订单匹配')
+//              console.log('开始订单匹配')
               if (that.orderData[i].ordersn === that.orderClaimForm.ordersn) {
-                console.log('开始订单匹配')
+//                console.log('开始订单匹配')
                 for (var j = 0; j < that.managerOp.length; j++) {
                   if (that.orderClaimForm.operationId === that.managerOp[j].managerId) {
-                    console.log('命名成功')
+//                    console.log('命名成功')
                     that.orderData[i].operatorName = that.managerOp[j].managerName
-                    console.log(that.orderData[i].operatorName)
+//                    console.log(that.orderData[i].operatorName)
+                    that.onSubmit()
                     that.orderClaimForm.ordersn = ''
                     that.orderClaimForm.operationId = ''
                   }
@@ -412,6 +418,7 @@
           pageIndex: that.lineOrder.pageIndex,
           pageSize: that.lineOrder.pageSize
         }
+//        console.log(BODY)
         axios.post(global.API + 'distrbuter/admin/customized/list', BODY, {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
@@ -507,15 +514,20 @@
         that.lineOrder.distributerId = row.distributerId
       },
       /** input改变，查询产品 */
-      inputChangePro () {
+      inputChangePro (value) {
         var that = this
-        for (var i = 0; i < that.lineData.length; i++) {
-          if (that.lineData[i].pName.indexOf(that.proName) > -1) {
-            that.lineLikeData.push(that.lineData[i])
-          }
-        }
-        console.log(that.lineLikeData)
-        that.lineData = that.lineLikeData
+        setTimeout(function () {
+          axios.get(global.API + 'distrbuter/product/list/100/' + value, {
+            headers: {
+              'Authorization': 'Sys ' + global.getCookie('authorization'),
+              'Content-Type': 'application/json'
+            }
+          }).then(function (response) {
+            that.lineData = response.data
+          }).catch(function (error) {
+            console.log(error)
+          })
+        }, 300)
       },
       /** 选择产品显示详情 */
       rowClickProduct (row) {
@@ -539,7 +551,7 @@
       /** 获取线路产品 */
       proData (authorization) {
         var that = this
-        axios.get(global.API + "distrbuter/product/list/100/''", {
+        axios.get(global.API + 'distrbuter/product/list/100', {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'

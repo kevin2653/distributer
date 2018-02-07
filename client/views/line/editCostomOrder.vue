@@ -43,7 +43,7 @@
               <el-input style="width: 23.2rem" v-model="orderDetails.day"></el-input>
             </el-form-item>
             <el-form-item label="临时团号:">
-              {{orderDetails.team_id}}
+              {{orderDetails.teamId}}
             </el-form-item>
             <el-form-item label="出行人数:">
               <label>成 人  </label><el-input style="width: 9rem" v-model="orderDetails.tourers.subNum.adult"></el-input>
@@ -269,7 +269,8 @@
       }
     },
     created: function () {
-      this.orderDetails = JSON.parse(this.$route.query.orderDetails)
+//      this.orderDetails = JSON.parse(this.$route.query.orderDetails)
+      this.getOrderDetails()
     },
     mounted: function () {},
     updated: function () {
@@ -296,6 +297,46 @@
       /** 返回上一层 */
       returnToUpLevel () {
         this.$router.push({path: '/line/lineCustomOrder/customOrderDetails', query: {customDetails: JSON.stringify(this.orderDetails)}})
+      },
+      /** 转换当前数据 */
+      getOrderDetails () {
+        this.orderDetails = JSON.parse(this.$route.query.orderDetails)
+        this.orderDetails.planeTicket.ShippingSpace = Number(this.orderDetails.planeTicket.ShippingSpace)
+//        if (Number(this.orderDetails.planeTicket.ShippingSpace) === 0) {
+//          this.orderDetails.planeTicket.ShippingSpace = '请选择'
+//        }
+        this.orderDetails.planeTicket.type = Number(this.orderDetails.planeTicket.type)
+//        if (Number(this.orderDetails.planeTicket.type) === 0) {
+//          this.orderDetails.planeTicket.type = '请选择'
+//        }
+        this.orderDetails.hotel.type = Number(this.orderDetails.hotel.type)
+//        if (Number(this.orderDetails.hotel.type) === 0) {
+//          this.orderDetails.hotel.type = '请选择'
+//        }
+        this.orderDetails.hotel.stars = Number(this.orderDetails.hotel.stars)
+//        if (Number(this.orderDetails.hotel.stars) === 0) {
+//          this.orderDetails.hotel.stars = '请选择'
+//        }
+        this.orderDetails.hotel.roomStandard = Number(this.orderDetails.hotel.roomStandard)
+//        if (Number(this.orderDetails.hotel.roomStandard) === 0) {
+//          this.orderDetails.hotel.roomStandard = '请选择'
+//        }
+        this.orderDetails.cars.type = Number(this.orderDetails.cars.type)
+//        if (Number(this.orderDetails.cars.type) === 0) {
+//          this.orderDetails.cars.type = '请选择'
+//        }
+        this.orderDetails.activity.InvitationType = Number(this.orderDetails.activity.InvitationType)
+//        if (Number(this.orderDetails.activity.InvitationType) === 0) {
+//          this.orderDetails.activity.InvitationType = '请选择'
+//        }
+        this.orderDetails.visa.reason = Number(this.orderDetails.visa.reason)
+//        if (Number(this.orderDetails.visa.reason) === 0) {
+//          this.orderDetails.activity.InvitationType = '请选择'
+//        }
+        this.orderDetails.visa.type = Number(this.orderDetails.visa.type)
+//        if (Number(this.orderDetails.visa.type) === 0) {
+//          this.orderDetails.visa.type = '请选择'
+//        }
       }
     }
   }

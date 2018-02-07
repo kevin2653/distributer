@@ -44,7 +44,7 @@
                 type="date"
                 placeholder="开始时间"
                 format="yyyy-MM-dd"
-                value-format="yyyy-MM-dd"
+                value-format="yyyy-MM-dd HH:mm"
                 style="width: 10rem">
               </el-date-picker>
               <label>-</label>
@@ -53,7 +53,7 @@
                 type="date"
                 placeholder="结束时间"
                 format="yyyy-MM-dd"
-                value-format="yyyy-MM-dd"
+                value-format="yyyy-MM-dd HH:mm"
                 style="width: 10rem">
               </el-date-picker>
             </el-form-item>
@@ -62,7 +62,7 @@
         <el-col :span="8">
           <div class="grid-content bg-purple">
             <el-form-item label="订单状态">
-              <el-select v-model="lineOrder.keyword" placeholder="请选择" style="width: 10rem">
+              <el-select v-model="lineOrder.orderStatus" placeholder="请选择" style="width: 10rem">
                 <el-option
                   v-for="item in orderStatusOp"
                   :key="item.value"
@@ -84,7 +84,7 @@
                            :before-close="handleClose" center class="modelStyle">
                   <el-container>
                     <el-aside width="50%">
-                      <el-input v-model="proName" @change="inputChangePro" placeholder="输入线路名称或产品编号"></el-input>
+                      <el-input v-model="proName" @input="inputChangePro" placeholder="输入线路名称或产品编号"></el-input>
                       <el-table :data="lineData" border @row-click="rowClickProduct" height="250" style="width: 100%">
                         <el-table-column prop="pName">
                         </el-table-column>
@@ -378,23 +378,7 @@
         /** 产品弹框 */
         dialogProduct: false,
         /** 订单状态 */
-        orderStatusOp: [{
-          value: 101,
-          label: '待支付'
-        }, {
-          value: 102,
-          label: '待确认'
-        }, {
-          value: 111,
-          label: '已确认'
-        }, {
-          value: 115,
-          label: '已出发'
-        }, {
-          value: 200,
-          label: '完成'
-        }
-        ],
+        orderStatusOp: global.orderStandStatus,
         /** 是否分配运营负责人 */
         isBeenManageOp: [{
           value: 0,
@@ -434,7 +418,7 @@
         /** form表单数据 */
         lineOrder: {
           distributerId: '', /** 代理商id */
-          keyword: '', /** 订单状态 */
+          orderStatus: '', /** 订单状态 */
           tourGroup: '', /** 团号 */
           operationId: '', /** 运营管理人员 */
           pid: '', /** 产品id */
@@ -728,18 +712,19 @@
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
-          console.log('开始认领订单')
-          console.log(response.data)
+//          console.log('开始认领订单')
+//          console.log(response.data)
           if (response.data.code === 'SUCCESS') {
             console.log(that.orderClaimForm.ordersn)
             for (var i = 0; i < that.orderData.length; i++) {
-              console.log('开始订单匹配')
+//              console.log('开始订单匹配')
               if (that.orderData[i].ordersn === that.orderClaimForm.ordersn) {
-                console.log('开始订单匹配2')
+//                console.log('开始订单匹配2')
                 for (var j = 0; j < that.managerOp.length; j++) {
                   if (that.orderClaimForm.operationId === that.managerOp[j].managerId) {
-                    console.log('命名成功')
+//                    console.log('命名成功')
                     that.orderData[i].operatorName = that.managerOp[j].managerName
+                    that.onSubmit()
                     that.orderClaimForm.ordersn = ''
                     that.orderClaimForm.operationId = ''
                     that.orderClaimForm.pName = ''
@@ -834,7 +819,7 @@
         var BODY = {
 //          type: 1, // 产品类型
           distributerId: that.lineOrder.distributerId, // 代理商id
-          keyword: that.lineOrder.keyword, // 订单状态
+          orderStatus: that.lineOrder.orderStatus, // 订单状态
           tourGroup: that.lineOrder.tourGroup, // 团号
           operatorId: that.lineOrder.operationId, // 运营人员
           pid: that.lineOrder.pid, // 产品id
@@ -844,14 +829,15 @@
           pageIndex: that.lineOrder.pageIndex,
           pageSize: that.lineOrder.pageSize
         }
+//        console.log(BODY)
         axios.post(global.API + 'distrbuter/admin/order/list', BODY, {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
-          console.log('开始查询表单')
-          console.log(response.data)
+//          console.log('开始查询表单')
+//          console.log(response.data)
           that.orderData = response.data.orderList
           that.totalNum = response.data.totalNum
           for (var i = 0; i < that.orderData.length; i++) {
@@ -878,12 +864,13 @@
       /** 重置表单 */
       onReset () {
         this.lineOrder.distributerId = ''
-        this.lineOrder.keyword = ''
+        this.lineOrder.orderStatus = ''
         this.lineOrder.tourGroup = ''
         this.lineOrder.operationId = ''
         this.lineOrder.pid = ''
         this.lineOrder.isBeenManage = ''
         this.lineOrder.addTime = ''
+        this.lineOrder.endTime = ''
         this.selectDistributer = '选择代理商'
         this.selectProduct = '选择产品'
         this.lineOrder.currentPage = 1
@@ -907,15 +894,21 @@
         that.tableData = that.disLikeTableData
       },
       /** input改变，查询产品 */
-      inputChangePro () {
+      inputChangePro (value) {
+//        console.log(value)
         var that = this
-        for (var i = 0; i < that.lineData.length; i++) {
-          if (that.lineData[i].pName.indexOf(that.proName) > -1) {
-            that.lineLikeData.push(that.lineData[i])
-          }
-        }
-        console.log(that.lineLikeData)
-        that.lineData = that.lineLikeData
+        setTimeout(function () {
+          axios.get(global.API + 'distrbuter/product/list/1/' + value, {
+            headers: {
+              'Authorization': 'Sys ' + global.getCookie('authorization'),
+              'Content-Type': 'application/json'
+            }
+          }).then(function (response) {
+            that.lineData = response.data
+          }).catch(function (error) {
+            console.log(error)
+          })
+        }, 300)
       },
       /** 回填产品 */
       BackFillProduct () {
@@ -974,12 +967,14 @@
       /** 获取线路产品 */
       proData () {
         var that = this
-        axios.get(global.API + "distrbuter/product/list/1/''", {
+        axios.get(global.API + 'distrbuter/product/list/1', {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
           }
         }).then(function (response) {
+//          console.log('获取线路产品')
+//          console.log(response.data)
           that.lineData = response.data
           if (typeof that.$route.query.lineOrder !== 'undefined') {
             that.rowClickProduct(that.lineOrder)

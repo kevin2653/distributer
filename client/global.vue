@@ -343,7 +343,9 @@
     return ''
   }
   // 全局API
-  const API = 'https://qa-api.yuelvhui.com/'
+  //  https://api.yuelvhui.com
+  // https://qa-api.yuelvhui.com/
+  const API = 'https://api.yuelvhui.com/'
   // 支付接口
   const payApi = 'https://payment.yuelvhui.com/prepay'
   // 分页显示数组
@@ -364,6 +366,12 @@
     value: 2,
     label: '会员常旅客护照'
   }]
+  // 转换日期格式
+  function changeFormat (long) {
+    var date = new Date(long * 1000)
+    var timeStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+    return timeStr
+  }
   export default {
     titleOp, // 职业身份
     genderOp, // 性别
@@ -395,6 +403,7 @@
     isNull,  // 是否为空
     passportOp, // 护照
     payApi,  // 支付接口
-    passportType // 护照类别
+    passportType, // 护照类别
+    changeFormat  // 转换日期格式
   }
 </script>

@@ -542,7 +542,7 @@
       /** 获取线路产品 */
       proData () {
         var that = this
-        axios.get(global.API + "distrbuter/product/list/1/''", {
+        axios.get(global.API + 'distrbuter/product/list/1', {
           headers: {
             'Authorization': 'Sys ' + global.getCookie('authorization'),
             'Content-Type': 'application/json'
