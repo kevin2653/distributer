@@ -176,11 +176,12 @@
         return ''
       },
       //  添加操作人员账号
-      updateOperator (managerId, operatorAccount) {
+      updateOperator (managerId, operatorAccount, status) {
         var that = this
         var BODY = {
           managerId: managerId,
-          operatorAccount: operatorAccount
+          operatorAccount: operatorAccount,
+          sign: status
         }
         axios.post('/api/systemManager/updateOperator', BODY, {
           headers: {
@@ -223,7 +224,7 @@
           managerId.push(this.multipleSelection[i].managerId)
           var operatorAccount = decodeURIComponent(this.getCookie('sysManagerName'))
           this.multipleSelection[i].operatorAccount = operatorAccount
-          this.updateOperator(this.multipleSelection[i].managerId, operatorAccount)
+          this.updateOperator(this.multipleSelection[i].managerId, operatorAccount, 1)
           for (var j = 0; j < this.managerTableData.length; j++) {
             if (this.multipleSelection[i].managerId === this.managerTableData[j].managerId) {
               this.managerTableData[j].managerStatusId = 0
@@ -232,8 +233,8 @@
           }
         }
         var managerStatusId = 0
-        console.log('开启批量禁用')
-        console.log(managerId)
+//        console.log('开启批量禁用')
+//        console.log(managerId)
         this.modifyStatus(managerId, managerStatusId)
       },
       /** 批量删除代理商账号 */
@@ -244,7 +245,7 @@
           managerId.push(that.multipleSelection[i].managerId)
           var operatorAccount = decodeURIComponent(this.getCookie('sysManagerName'))
           that.multipleSelection[i].operatorAccount = operatorAccount
-          this.updateOperator(that.multipleSelection[i].managerId, operatorAccount)
+          this.updateOperator(that.multipleSelection[i].managerId, operatorAccount, 1)
           for (var j = 0; j < that.managerTableData.length; j++) {
             if (that.multipleSelection[i].managerId === that.managerTableData[j].managerId) {
               that.managerTableData[j].managerStatusId = 2
@@ -255,9 +256,9 @@
           }
         }
         var managerStatusId = 2
-        console.log(managerId)
+//        console.log(managerId)
         this.modifyStatus(managerId, managerStatusId)
-        console.log('开启弹窗')
+//        console.log('开启弹窗')
         this.delAccountVisible = true
         that.timeMsg()
       },
@@ -269,7 +270,7 @@
         this.modifyStatus(managerId, managerStatusId)
         var operatorAccount = decodeURIComponent(this.getCookie('sysManagerName'))
         row.operatorAccount = operatorAccount
-        this.updateOperator(row.managerId, operatorAccount)
+        this.updateOperator(row.managerId, operatorAccount, 1)
         for (var j = 0; j < this.managerTableData.length; j++) {
           if (row.managerId === this.managerTableData[j].managerId) {
             this.managerTableData[j].managerStatusIdStr = '禁用'
@@ -283,8 +284,8 @@
         managerId.push(row.managerId)
         var operatorAccount = decodeURIComponent(this.getCookie('sysManagerName'))
         row.operatorAccount = operatorAccount
-        this.updateOperator(row.managerId, operatorAccount)
-        var managerStatusId = 0
+        this.updateOperator(row.managerId, operatorAccount, 1)
+        var managerStatusId = 1
         this.modifyStatus(managerId, managerStatusId)
         for (var j = 0; j < this.managerTableData.length; j++) {
           if (row.managerId === this.managerTableData[j].managerId) {
@@ -316,8 +317,8 @@
       /** 重置密码 */
       restPassword (index, row) {
         var that = this
-        console.log(index)
-        console.log(row)
+//        console.log(index)
+//        console.log(row)
         axios.post('/api/systemManager/resetPassword', {managerId: row.managerId}, {
           headers: {
             'Content-Type': 'application/json',
@@ -329,7 +330,7 @@
             that.password = response.data.password
             var operatorAccount = decodeURIComponent(that.getCookie('sysManagerName'))
             row.operatorAccount = operatorAccount
-            that.updateOperator(row.managerId, operatorAccount)
+            that.updateOperator(row.managerId, operatorAccount, 0)
           }
           that.restPasswordVisible = true
 //          console.log('重置密码结束')

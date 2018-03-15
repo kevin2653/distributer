@@ -5,7 +5,7 @@
         <el-row :gutter="20">
           <el-col :span="8">
             <div class="grid-content bg-purple">
-              <el-input v-model="Fname" @change="FinputChange" placeholder="输入一级代理商名称"></el-input>
+              <el-input v-model="Fname" @input="FinputChange" placeholder="输入一级代理商名称"></el-input>
               <el-table :data="FtableData" border :show-header="false" @row-click="rowClick" height="350" style="width: 100%">
                 <el-table-column prop="distributerName" align="center">
                 </el-table-column>
@@ -14,7 +14,7 @@
           </el-col>
           <el-col :span="8">
             <div class="grid-content bg-purple">
-              <el-input v-model="Sname" @change="SinputChange" placeholder="输入二级代理商名称"></el-input>
+              <el-input v-model="Sname" @input="SinputChange" placeholder="输入二级代理商名称"></el-input>
               <el-table :data="StableData" :show-header="false" @row-click="rowClick" border height="350" style="width: 100%" >
                 <el-table-column prop="distributerName" align="center">
                 </el-table-column>
@@ -23,7 +23,7 @@
           </el-col>
           <el-col :span="8">
             <div class="grid-content bg-purple">
-              <el-input v-model="Tname" @change="TinputChange" placeholder="输入三级代理商名称"></el-input>
+              <el-input v-model="Tname" @input="TinputChange" placeholder="输入三级代理商名称"></el-input>
               <el-table :data="TtableData" :show-header="false" border height="350" style="width: 100%">
                 <el-table-column prop="distributerName" align="center">
                 </el-table-column>
@@ -69,9 +69,9 @@
         return ''
       },
       /** input改变，模糊查询一级代理商 */
-      FinputChange () {
+      FinputChange (value) {
         var that = this
-        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: 1, distributerName: that.Fname}, {
+        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: 1, distributerName: value}, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Admin ' + that.getCookie('admin_token')
@@ -87,9 +87,9 @@
         })
       },
       /** input改变，模糊查询二级代理商 */
-      SinputChange () {
+      SinputChange (value) {
         var that = this
-        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: 2, distributerName: that.Sname}, {
+        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: 2, distributerName: value}, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Admin ' + that.getCookie('admin_token')
@@ -105,9 +105,9 @@
         })
       },
       /** input改变，模糊查询三级代理商 */
-      TinputChange () {
+      TinputChange (value) {
         var that = this
-        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: 3, distributerName: that.Tname}, {
+        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {depath: 3, distributerName: value}, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Admin ' + that.getCookie('admin_token')
@@ -124,10 +124,10 @@
       },
       /** 显示下级代理商 */
       rowClick (row) {
-        console.log('row id')
-        console.log(row.distributerId)
-        console.log('row 深度')
-        console.log(row.depath)
+//        console.log('row id')
+//        console.log(row.distributerId)
+//        console.log('row 深度')
+//        console.log(row.depath)
         var that = this
         axios.post('/api/distributerInfo/queryAllDistributerByJoin', {distributerPid: row.distributerId, depath: (row.depath + 1)}, {
           headers: {
@@ -135,8 +135,8 @@
             'Authorization': 'Admin ' + that.getCookie('admin_token')
           }
         }).then(function (response) {
-          console.log('长度')
-          console.log(response.data.listDto.length)
+//          console.log('长度')
+//          console.log(response.data.listDto.length)
           if (response.data.listDto.length > 0) {
             if (row.depath === 1) {
               that.StableData = response.data.listDto

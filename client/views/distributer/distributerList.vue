@@ -25,7 +25,7 @@
                                :before-close="handleClose" center class="modelStyle">
                       <el-container>
                         <el-aside width="50%">
-                          <el-input v-model="name" @change="inputChange" placeholder="输入代理商名称"></el-input>
+                          <el-input v-model="name" @input="inputChange" placeholder="输入代理商名称"></el-input>
                           <el-table :data="tableData" :show-header="false" border @row-click="rowClick" height="250" style="width: 100%">
                             <el-table-column prop="distributerName">
                             </el-table-column>
@@ -313,11 +313,11 @@
         this.distributerInfoDTO.pageSize = 5
       },
       /** input改变，模糊查询代理商 */
-      inputChange () {
+      inputChange (value) {
         var that = this
-        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {distributerName: that.name}, {
+        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {distributerName: value}, {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
             'Authorization': 'Admin ' + global.getCookie('admin_token')
           }
         }).then(function (response) {

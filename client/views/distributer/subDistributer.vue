@@ -209,7 +209,7 @@
       this.dataGet()
 //      this.dataProArea(37)
       this.areaGet()
-      this.onSubmit()
+//      this.onSubmit()
     },
     updated: function () {
     },
@@ -295,6 +295,9 @@
           }
         }).then(function (response) {
           that.areaData = response.data
+          if (that.$route.query.distributerPid > 0) {
+            that.onSubmit()
+          }
           for (var k = 0; k < that.areaData.length; k++) {
             if (that.areaData[k].pid === 37) {
               that.provinceOp.push(that.areaData[k])

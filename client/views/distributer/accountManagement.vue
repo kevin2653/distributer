@@ -11,7 +11,7 @@
                            :before-close="handleClose" center class="modelStyle">
                   <el-container>
                     <el-aside width="50%">
-                      <el-input v-model="name" @change="inputChange" placeholder="输入代理商名称"></el-input>
+                      <el-input v-model="name" @input="inputChange" placeholder="输入代理商名称"></el-input>
                       <el-table :data="tableData" :show-header="false" border @row-click="rowClick" height="250" style="width: 100%">
                         <el-table-column prop="distributerName">
                         </el-table-column>
@@ -229,12 +229,12 @@
       handleSizeChange (val) {
         this.distributerAccount.pageSize = val
         this.onSubmit()
-        console.log(`每页 ${val} 条`)
+//        console.log(`每页 ${val} 条`)
       },
       handleCurrentChange (val) {
         this.distributerAccount.currentPage = val
         this.onSubmit()
-        console.log(`当前页: ${val}`)
+//        console.log(`当前页: ${val}`)
       },
       /** 关闭代理商弹窗 */
       handleClose (done) {
@@ -248,19 +248,19 @@
       /** 定时执行函数 */
       timeMsg () {
         var that = this
-        console.log('开始执行定时任务')
+//        console.log('开始执行定时任务')
         setTimeout(function () {
-          console.log('定时任务 Go!')
+//          console.log('定时任务 Go!')
           that.delAccountVisible = false
         }, 5000)
-        console.log('执行定时任务结束')
+//        console.log('执行定时任务结束')
       },
       /** 批量禁用代理商账号 */
       disBatchAccount () {
         var accountId = []
         var accountStatusId = 0
-        console.log('开启批量禁用')
-        console.log(accountId)
+//        console.log('开启批量禁用')
+//        console.log(accountId)
         this.modifyStatus(accountId, accountStatusId)
         for (var i = 0; i < this.multipleSelection.length; i++) {
           accountId.push(this.multipleSelection[i].accountId)
@@ -298,8 +298,8 @@
       ablBatchAccount () {
         var accountId = []
         var accountStatusId = 1
-        console.log('开启批量启用')
-        console.log(accountId)
+//        console.log('开启批量启用')
+//        console.log(accountId)
         this.modifyStatus(accountId, accountStatusId)
         for (var i = 0; i < this.multipleSelection.length; i++) {
           accountId.push(this.multipleSelection[i].accountId)
@@ -442,8 +442,8 @@
             this.buttonMan.buttonDel = true
           }
         }
-        console.log('打印选择内容')
-        console.log(this.multipleSelection)
+//        console.log('打印选择内容')
+//        console.log(this.multipleSelection)
       },
       /** 添加账号 */
       addAccount () {
@@ -519,9 +519,9 @@
         this.distributerData = [{}]
       },
       /** input改变，模糊查询代理商 */
-      inputChange () {
+      inputChange (value) {
         var that = this
-        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {distributerName: that.name}, {
+        axios.post('/api/distributerInfo/queryAllDistributerByJoin', {distributerName: value}, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Admin ' + global.getCookie('admin_token')

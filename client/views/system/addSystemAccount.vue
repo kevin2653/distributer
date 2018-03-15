@@ -58,7 +58,7 @@
         },
         rules: {
           managerName: [
-            {required: true, message: '请输入收款开户名称', trigger: 'blur'}
+            {required: true, message: '请输入用户姓名', trigger: 'blur'}
           ],
           managerAccount: [
             {required: true, message: '请输入账号', trigger: 'change'}
@@ -93,12 +93,12 @@
       /** 定时执行函数 */
       timeMsg () {
         var that = this
-        console.log('开始执行定时任务')
+//        console.log('开始执行定时任务')
         setTimeout(function () {
-          console.log('定时任务 Go!')
+//          console.log('定时任务 Go!')
           that.addAccountVisible = false
         }, 5000)
-        console.log('执行定时任务结束')
+//        console.log('执行定时任务结束')
       },
       onSubmit () {
         this.$refs.addAcountForm.validate((valid) => {
@@ -109,22 +109,23 @@
               managerAccount: that.addAcountForm.managerAccount,
               managerPassword: that.addAcountForm.managerPassword
             }
-            console.log(BODY)
+//            console.log(BODY)
             axios.post('/api/systemManager/insertSystemManager', BODY, {
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Admin ' + that.getCookie('admin_token')
               }
             }).then(function (response) {
-              console.log('添加代理商账号开始')
+//              console.log('添加代理商账号开始')
               if (response.data === true) {
                 that.addAcountForm.managerName = ''
                 that.addAcountForm.managerAccount = ''
                 that.addAcountForm.managerPassword = ''
+                that.addAccountVisible = true
                 that.timeMsg()
                 that.$refs.addAcountForm.resetFields()
               }
-              console.log('添加代理商账号结束')
+//              console.log('添加代理商账号结束')
             }).catch(function (error) {
               console.log(error)
             })

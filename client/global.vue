@@ -345,7 +345,7 @@
   // 全局API
   //  https://api.yuelvhui.com
   // https://qa-api.yuelvhui.com/
-  const API = 'https://qa-api.yuelvhui.com/'
+  const API = 'https://api.yuelvhui.com/'
   // 支付接口
   const payApi = 'https://payment.yuelvhui.com/prepay'
   // 分页显示数组

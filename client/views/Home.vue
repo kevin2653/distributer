@@ -210,6 +210,8 @@
             'Authorization': 'Sys ' + that.getCookie('authorization')
           }
         }).then((response) => {
+//          console.log('全年订单数')
+//          console.log(response.data)
           that.dataOrder = response.data
           // 按照订单类型分别将订单添加到数组中
           for (var i = 0; i < response.data.typeList.length; i++) {
@@ -218,18 +220,20 @@
                 that.standLabels.push(response.data.typeList[i].month[j])
                 that.standSeries[0].push(response.data.typeList[i].orderNum[j])
               }
-            } else if (response.data.typeList[i].type === 8) {
+            } else if (response.data.typeList[i].type === 100) {
               for (var k = 0; k < response.data.typeList[i].month.length; k++) {
                 that.madeLabels.push(response.data.typeList[i].month[k])
                 that.madeSeries[0].push(response.data.typeList[i].orderNum[k])
               }
-            } else if (response.data.typeList[i].type === 100) {
+            } else if (response.data.typeList[i].type === 8) {
               for (var m = 0; m < response.data.typeList[i].month.length; m++) {
                 that.visaLabels.push(response.data.typeList[i].month[m])
                 that.visaSeries[0].push(response.data.typeList[i].orderNum[m])
               }
             }
           }
+//          console.log(that.standLabels)
+//          console.log(that.standSeries[0])
         }).catch(function (error) {
           console.log(error)
         })
